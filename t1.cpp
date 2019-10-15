@@ -45,7 +45,7 @@ void Vertice::set_y(int y) {
 
 class Caminho {
 public:
-    int tamanho;
+    int tamanho, peso;
     vector<Vertice> c;
 
     Caminho();
@@ -56,6 +56,7 @@ public:
 
 Caminho::Caminho() {
     this->tamanho = 0;
+    this->peso = 0;
 }
 
 void Caminho::add_vertice(Vertice v) {
@@ -91,7 +92,7 @@ public:
 
     void le_entrada();
     void exibe_labirinto();
-    int DFS(int x, int y, Caminho& c, int& count);
+    int DFS(int x, int y, Caminho& c);
 
 };
 
@@ -139,11 +140,8 @@ void Labirinto::exibe_labirinto() {
     }
 }
 
-int Labirinto::DFS(int x, int y, Caminho& c, int& count) {
+int Labirinto::DFS(int x, int y, Caminho& c) {
 
-    count++;
-    if( count > 1000)
-        return 0;
     // verifica se x ou y estao fora do labirinto ou sao paredes ou ja foram percorridos.
     if((x < 0 or x >= this->lin) or (y < 0 or y >= this->col) or (this->m[x][y] == '-' or this->m[x][y] == 'O'))
         return 0;
@@ -162,22 +160,14 @@ int Labirinto::DFS(int x, int y, Caminho& c, int& count) {
     int r = 0;
     
     // ordem (horario): cima dir baixo esq
-    r = DFS(x-1, y, c, count); // Cima
-    if(r == 1) { 
-        return 1;
-    }
-    r = DFS(x, y+1, c, count); // Direita
-    if(r == 1) { 
-        return 1;
-    }
-    r = DFS(x+1, y, c, count); // Baixo
-    if(r == 1) { 
-        return 1;
-    }
-    r = DFS(x, y-1, c, count); // Esquerda
-    if(r == 1) { 
-        return 1;
-    }
+    r = DFS(x-1, y, c); // Cima
+    if(r == 1) { return 1; }
+    r = DFS(x, y+1, c); // Direita
+    if(r == 1) { return 1; }
+    r = DFS(x+1, y, c); // Baixo
+    if(r == 1) { return 1; }
+    r = DFS(x, y-1, c); // Esquerda
+    if(r == 1) { return 1; }
 
     // se chegou aqui, o caminho nao vai pra lugar nenhum, portanto deve voltar
     c.pop_back();
@@ -198,9 +188,8 @@ int main(int argc, char const **argv) {
     lab.exibe_labirinto();
 
     Caminho c;
-    int a =0;
 
-    lab.DFS(lab.xi, lab.yi, c, a);
+    lab.DFS(lab.xi, lab.yi, c);
     cout << "teminou dfs" << endl;
     c.exibe_caminho();
     lab.exibe_labirinto();
