@@ -5,6 +5,7 @@
 
 using namespace std;
 
+#define RAIZ_2 1.41421
 
 /* ..:: Classe Vertice ::.. */
 /*****************************************************************************************************/
@@ -65,7 +66,7 @@ void Caminho::add_vertice(Vertice v) {
 }
 
 void Caminho::exibe_caminho() {
-    cout << "tamanho: " << this->tamanho << endl << "[ ";
+    cout << "tamanho: " << this->tamanho << ", peso: " << this->peso << endl << "[ ";
     for(int i = 0; i < this->tamanho; i++) {
         cout << "(" << this->c[i].x << ", " << this->c[i].y << ") ";
     }
@@ -92,7 +93,7 @@ public:
 
     void le_entrada();
     void exibe_labirinto();
-    int DFS(int x, int y, Caminho& c);
+    int DFS(int x, int y, Caminho& c, float passo);
 
 };
 
@@ -140,7 +141,13 @@ void Labirinto::exibe_labirinto() {
     }
 }
 
-int Labirinto::DFS(int x, int y, Caminho& c) {
+/* Busca em Profundidade
+    Parametros:
+        x,y - posicao atual na busca
+        caminho c - caminho atual percorrido
+        float passo - peso do passo dado (diagonal, normal, comeco).
+*/
+int Labirinto::DFS(int x, int y, Caminho& c, float passo) {
 
     // verifica se x ou y estao fora do labirinto ou sao paredes ou ja foram percorridos.
     if((x < 0 or x >= this->lin) or (y < 0 or y >= this->col) or (this->m[x][y] == '-' or this->m[x][y] == 'O'))
@@ -149,6 +156,7 @@ int Labirinto::DFS(int x, int y, Caminho& c) {
     // coloca (x,y) no caminho
     //cout << x << " " << y << endl;
     c.add_vertice(Vertice(x, y));
+    c.peso += passo;
     this->m[x][y] = 'O';
     //cout << "adicionou" << endl;
 
@@ -159,18 +167,27 @@ int Labirinto::DFS(int x, int y, Caminho& c) {
     }
     int r = 0;
     
-    // ordem (horario): cima dir baixo esq
-    r = DFS(x-1, y, c); // Cima
+    // Ordem (horario): cima, nordeste, direita, sudeste, baixo, sudoeste, esquerda, noroeste
+    r = DFS(x-1, y, c, 1); // Cima
     if(r == 1) { return 1; }
-    r = DFS(x, y+1, c); // Direita
+    r = DFS(x-1, y+1, c, RAIZ_2); // diagonal nordeste
     if(r == 1) { return 1; }
-    r = DFS(x+1, y, c); // Baixo
+    r = DFS(x, y+1, c, 1); // Direita
     if(r == 1) { return 1; }
-    r = DFS(x, y-1, c); // Esquerda
+    r = DFS(x+1, y+1, c, RAIZ_2); // diagonal sudeste
+    if(r == 1) { return 1; }
+    r = DFS(x+1, y, c, 1); // Baixo
+    if(r == 1) { return 1; }
+    r = DFS(x+1, y-1, c, RAIZ_2); // diagonal sudoeste
+    if(r == 1) { return 1; }
+    r = DFS(x, y-1, c, 1); // Esquerda
+    if(r == 1) { return 1; }
+    r = DFS(x-1, y-1, c, RAIZ_2); // diagonal noroeste
     if(r == 1) { return 1; }
 
     // se chegou aqui, o caminho nao vai pra lugar nenhum, portanto deve voltar
     c.pop_back();
+    c.peso -= passo;
     this->m[x][y] = '*';
     //cout << "voltando : " << x << " " << y << endl;
     return 0;
@@ -189,7 +206,7 @@ int main(int argc, char const **argv) {
 
     Caminho c;
 
-    lab.DFS(lab.xi, lab.yi, c);
+    lab.DFS(lab.xi, lab.yi, c, 0);
     cout << "teminou dfs" << endl;
     c.exibe_caminho();
     lab.exibe_labirinto();
