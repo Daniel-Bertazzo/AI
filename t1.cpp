@@ -1,3 +1,11 @@
+/* Trabalho 1 de Inteligencia Artificial, 2o semestre 2019
+    Buscas em labirinto.
+
+    Grupo:
+        Alexandre Norcia Medeiros    - 10295583
+        Daniel Penna Chaves Bertazzo - 10349561
+*/
+
 #include <iostream>
 #include <string>
 #include <vector>
@@ -46,7 +54,8 @@ void Vertice::set_y(int y) {
 
 class Caminho {
 public:
-    int tamanho, peso;
+    int tamanho;
+    float peso;
     vector<Vertice> c;
 
     Caminho();
@@ -141,11 +150,22 @@ void Labirinto::exibe_labirinto() {
     }
 }
 
-/* Busca em Profundidade
+/* Busca em Profundidade recursiva.
     Parametros:
         x,y - posicao atual na busca
         caminho c - caminho atual percorrido
         float passo - peso do passo dado (diagonal, normal, comeco).
+*/
+/* ****APAGAR DEPOIS
+    tem que comentar no realatorio
+
+    - algoritimo esta restrito a ordem definida de escolha do proximo passo.
+        -> sempre faz na mesma ordem sem inteligencia, eficiencia depende do labirinto
+           (nesse caso, o labirinto ideal seria uma reta identidade (nordeste))
+    - ordem decidida, diagonais priorizadas
+        -> faz com que o caminho seja menor, mas nao necessariamente menor peso
+    - sentido horario
+
 */
 int Labirinto::DFS(int x, int y, Caminho& c, float passo) {
 
@@ -154,42 +174,39 @@ int Labirinto::DFS(int x, int y, Caminho& c, float passo) {
         return 0;
 
     // coloca (x,y) no caminho
-    //cout << x << " " << y << endl;
     c.add_vertice(Vertice(x, y));
     c.peso += passo;
     this->m[x][y] = 'O';
-    //cout << "adicionou" << endl;
 
     if(x == this->xf and y == this->yf){
-        //cout << "CHEGOU!!!!!!!!!" << endl;
         this->m[x][y] = '$';
         return 1;
     }
     int r = 0;
     
     // Ordem (horario): cima, nordeste, direita, sudeste, baixo, sudoeste, esquerda, noroeste
-    r = DFS(x-1, y, c, 1); // Cima
-    if(r == 1) { return 1; }
     r = DFS(x-1, y+1, c, RAIZ_2); // diagonal nordeste
-    if(r == 1) { return 1; }
-    r = DFS(x, y+1, c, 1); // Direita
-    if(r == 1) { return 1; }
+    if (r == 1) return 1;
     r = DFS(x+1, y+1, c, RAIZ_2); // diagonal sudeste
-    if(r == 1) { return 1; }
-    r = DFS(x+1, y, c, 1); // Baixo
-    if(r == 1) { return 1; }
+    if (r == 1) return 1;
     r = DFS(x+1, y-1, c, RAIZ_2); // diagonal sudoeste
-    if(r == 1) { return 1; }
-    r = DFS(x, y-1, c, 1); // Esquerda
-    if(r == 1) { return 1; }
+    if (r == 1) return 1;
     r = DFS(x-1, y-1, c, RAIZ_2); // diagonal noroeste
-    if(r == 1) { return 1; }
+    if (r == 1) return 1;
+    
+    r = DFS(x-1, y, c, 1); // Cima
+    if (r == 1) return 1;
+    r = DFS(x, y+1, c, 1); // Direita
+    if (r == 1) return 1;
+    r = DFS(x+1, y, c, 1); // Baixo
+    if (r == 1) return 1;
+    r = DFS(x, y-1, c, 1); // Esquerda
+    if (r == 1) return 1;
 
     // se chegou aqui, o caminho nao vai pra lugar nenhum, portanto deve voltar
     c.pop_back();
     c.peso -= passo;
     this->m[x][y] = '*';
-    //cout << "voltando : " << x << " " << y << endl;
     return 0;
 }
 
