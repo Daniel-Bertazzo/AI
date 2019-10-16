@@ -67,7 +67,7 @@ public:
 
 Caminho::Caminho() {
     this->tamanho = 0;
-    this->peso = 0;
+    this->peso = 0.0;
 }
 
 void Caminho::push_back(Vertice v) {
@@ -77,7 +77,7 @@ void Caminho::push_back(Vertice v) {
 
 void Caminho::exibe_caminho() {
     cout << "tamanho: " << this->tamanho << ", peso: " << this->peso << endl << "[ ";
-    for(int i = 0; i < this->tamanho; i++) {
+    for (int i = 0; i < this->tamanho; i++) {
         cout << "(" << this->c[i].x << ", " << this->c[i].y << ") ";
     }
     cout << "]" << endl;
@@ -150,7 +150,7 @@ void Labirinto::le_entrada() {
 }
 
 void Labirinto::exibe_labirinto() {
-    for(int i = 0; i < this->lin; i++) {
+    for (int i = 0; i < this->lin; i++) {
         for (int j = 0; j < this->col; j++) {
             cout << this->m[i][j];
         }    
@@ -182,7 +182,7 @@ void Labirinto::exibe_labirinto() {
 int Labirinto::DFS(int x, int y, Caminho& c, float passo) {
 
     // verifica se x ou y estao fora do labirinto ou sao paredes ou ja foram percorridos.
-    if((x < 0 or x >= this->lin) or (y < 0 or y >= this->col) or (this->m[x][y] == '-' or this->m[x][y] == 'O'))
+    if ((x < 0 or x >= this->lin) or (y < 0 or y >= this->col) or (this->m[x][y] == '-' or this->m[x][y] == 'O'))
         return 0;
 
     // coloca (x,y) no caminho
@@ -220,7 +220,7 @@ int Labirinto::DFS(int x, int y, Caminho& c, float passo) {
     c.pop_back();
     c.peso -= passo;
     this->m[x][y] = '*';
-    if(c.tamanho == 0) // caso onde nao existe caminho da origem ate o destino
+    if (c.tamanho == 0) // caso onde nao existe caminho da origem ate o destino
         this->m[x][y] = '#'; // remove status de visitado da origem
     
     return 0;
@@ -256,9 +256,9 @@ void Labirinto::BFS(int x, int y, Caminho& c) {
 
     aux_c.push_back(Vertice(x,y));
     q.push(aux_c); // adiciona vertice inicial na fila
-    this->m[x][y] = 'v'; // marca como descoberto.
+    this->m[x][y] = 'v'; // marca como visitado
 
-    while(!q.empty()) {
+    while (!q.empty()) {
         // remove caminho atual.
         aux_c = q.front();
         vert = aux_c.back();
