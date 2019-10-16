@@ -4,10 +4,10 @@
     Grupo:
         Alexandre Norcia Medeiros    - 10295583
         Daniel Penna Chaves Bertazzo - 10349561
+        Miguel de Mattos Gardini     - 10295728
 */
 
 #include <iostream>
-#include <string>
 #include <vector>
 #include <queue>
 #include <math.h>
@@ -18,7 +18,6 @@ using namespace std;
 
 /* ..:: Classe Vertice ::.. */
 /*****************************************************************************************************/
-
 
 class Vertice {
 public:
@@ -57,10 +56,9 @@ void Vertice::exibe() {
 /* ..:: Classe Caminho ::.. */
 /*****************************************************************************************************/
 
-
 class Caminho {
 public:
-    float h;
+    float h; // valor da funcao heuristica (a*)
     int tamanho;
     float peso;
     vector<Vertice> c;
@@ -75,8 +73,6 @@ public:
     // sobrecarga de operadores
     bool operator< (const Caminho& c2) const;
     bool operator> (const Caminho& c2) const;
-    // friend bool operator< (const Caminho& c1, const Caminho& c2);
-    // friend bool operator> (const Caminho& c1, const Caminho& c2);
 };
 
 Caminho::Caminho() {
@@ -232,16 +228,7 @@ int Labirinto::DFS(int x, int y, Caminho& c, float passo) {
     }
     int r = 0;
     
-    // Ordem (diagonal e horario): nordeste, sudeste, sudoeste, noroeste, cima, direita, baixo, esquerda
-    r = DFS(x-1, y+1, c, RAIZ_2); // diagonal nordeste
-    if (r == 1) return 1;
-    r = DFS(x+1, y+1, c, RAIZ_2); // diagonal sudeste
-    if (r == 1) return 1;
-    r = DFS(x+1, y-1, c, RAIZ_2); // diagonal sudoeste
-    if (r == 1) return 1;
-    r = DFS(x-1, y-1, c, RAIZ_2); // diagonal noroeste
-    if (r == 1) return 1;
-    
+    // Ordem (horario e diagonal):cima, direita, baixo, esquerda, nordeste, sudeste, sudoeste, noroeste
     r = DFS(x-1, y, c, 1); // Cima
     if (r == 1) return 1;
     r = DFS(x, y+1, c, 1); // Direita
@@ -250,6 +237,16 @@ int Labirinto::DFS(int x, int y, Caminho& c, float passo) {
     if (r == 1) return 1;
     r = DFS(x, y-1, c, 1); // Esquerda
     if (r == 1) return 1;
+    
+    r = DFS(x-1, y+1, c, RAIZ_2); // diagonal nordeste
+    if (r == 1) return 1;
+    r = DFS(x+1, y+1, c, RAIZ_2); // diagonal sudeste
+    if (r == 1) return 1;
+    r = DFS(x+1, y-1, c, RAIZ_2); // diagonal sudoeste
+    if (r == 1) return 1;
+    r = DFS(x-1, y-1, c, RAIZ_2); // diagonal noroeste
+    if (r == 1) return 1;
+   
 
     // se chegou aqui, o caminho nao vai pra lugar nenhum, portanto deve voltar
     c.pop_back();
@@ -523,13 +520,9 @@ void Labirinto::a_estrela(int x, int y, Caminho& c) {
         {
             return ((c1.peso + c1.h) > (c2.peso + c2.h));
         };
-    // auto my_comp =
-    //     [](const my_pair_t& e1, const my_pair_t& e2) 
-    //     { return e1.first > e2.first; };
-    // std::priority_queue<my_pair_t,my_container_t,decltype(my_comp)> queue(my_comp);
 
     // fila de prioridade com ordem crescente (menor fica no topo)
-    priority_queue<Caminho, vector<Caminho>, decltype(f_comparacao) > q(f_comparacao);
+    priority_queue<Caminho, vector<Caminho>, decltype(f_comparacao)> q(f_comparacao);
 
     aux_c.push_back(Vertice(x,y));
     aux_c.calcula_h(this->xf, this->yf);
@@ -655,8 +648,8 @@ int main(int argc, char const **argv) {
 
     Caminho c;
 
-    //lab.DFS(lab.xi, lab.yi, c, 0);
-    //cout << "teminou dfs" << endl;
+    // lab.DFS(lab.xi, lab.yi, c, 0);
+    // cout << "teminou dfs" << endl;
     
     // lab.BFS(lab.xi, lab.yi, c);
     // cout << "teminou bfs" << endl;
