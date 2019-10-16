@@ -68,6 +68,12 @@ public:
     void exibe();
     void pop_back();
     Vertice back();
+
+    // sobrecarga de operadores
+    bool operator< (const Caminho& c2) const;
+    bool operator> (const Caminho& c2) const;
+    // friend bool operator< (const Caminho& c1, const Caminho& c2);
+    // friend bool operator> (const Caminho& c1, const Caminho& c2);
 };
 
 Caminho::Caminho() {
@@ -99,6 +105,26 @@ Vertice Caminho::back() {
     return this->c.back();
 }
 
+ /* Sobrecarga da comparacao '<'
+ */
+bool Caminho::operator< (const Caminho& c2) const {
+    return this->peso < c2.peso;
+}
+
+// bool Caminho::operator< (const Caminho& c1, const Caminho& c2) {
+//     return c1.peso < c2.peso;
+// }
+
+// bool operator> (const Caminho& c1, const Caminho& c2) {
+//     return c1.peso > c2.peso;
+// }
+
+ /* Sobrecarga da comparacao '>'
+ */
+bool Caminho::operator> (const Caminho& c2) const {
+    return this->peso > c2.peso;
+}
+
 
 /* ..:: Classe Labirinto ::.. */
 /*****************************************************************************************************/
@@ -116,6 +142,7 @@ public:
     void exibe();
     int DFS(int x, int y, Caminho& c, float passo);
     void BFS(int x, int y, Caminho& c);
+    void Best_first_search(int x, int y, Caminho& c);
 
 };
 
@@ -350,20 +377,21 @@ void Labirinto::BFS(int x, int y, Caminho& c) {
 }
 
 
-/* Busca em largura iterativa.
+/* Busca best first.
     Parametros:
         int x,y - vertice inical
         caminho c - guarda o caminho final, vazio caso nao exista.
 
     COLOCAR NO RELATORIO: (apagar depois)
-    na BFS, todos os vertices visitados durante a execucao sao marcados no labirinto com a letra 'v',
-    porem apenas o caminho final eh marcado com a letra 'O', assim como na DFS.
+    nessa busca acha o menor por explorar o menor.
 */            
-void Labirinto::Best_fit(int x, int y, Caminho& c) {
+void Labirinto::Best_first_search(int x, int y, Caminho& c) {
 
     Caminho aux_c;
     Vertice vert;
-    queue<Caminho> q;
+
+    // fila de prioridade com ordem crescente (menor fica no topo)
+    priority_queue<Caminho, vector<Caminho>, greater<Caminho> > q;
 
     aux_c.push_back(Vertice(x,y));
     q.push(aux_c); // adiciona vertice inicial na fila
@@ -372,7 +400,7 @@ void Labirinto::Best_fit(int x, int y, Caminho& c) {
 
     while(!q.empty()) {
         // remove caminho atual.
-        aux_c = q.front();
+        aux_c = q.top();
         vert = aux_c.back();
         q.pop();
 
@@ -484,9 +512,12 @@ int main(int argc, char const **argv) {
     //lab.DFS(lab.xi, lab.yi, c, 0);
     //cout << "teminou dfs" << endl;
     
-    lab.BFS(lab.xi, lab.yi, c);
-    cout << "teminou bfs" << endl;
+    // lab.BFS(lab.xi, lab.yi, c);
+    // cout << "teminou bfs" << endl;
     
+    lab.Best_first_search(lab.xi, lab.yi, c);
+    cout << "terminou best first" << endl;
+
     c.exibe();
     lab.exibe();
 
