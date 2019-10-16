@@ -10,6 +10,7 @@
 #include <string>
 #include <vector>
 #include <queue>
+#include <math.h>
 
 using namespace std;
 
@@ -59,6 +60,7 @@ void Vertice::exibe() {
 
 class Caminho {
 public:
+    float h;
     int tamanho;
     float peso;
     vector<Vertice> c;
@@ -67,7 +69,8 @@ public:
     void push_back(Vertice v);
     void exibe();
     void pop_back();
-    Vertice back();
+    Vertice back() const;
+    void calcula_h(int x, int y);
 
     // sobrecarga de operadores
     bool operator< (const Caminho& c2) const;
@@ -101,8 +104,15 @@ void Caminho::pop_back() {
 
 /* Retorna o ultimo vertice do caminho
 */
-Vertice Caminho::back() {
+Vertice Caminho::back() const{
     return this->c.back();
+}
+
+/* Funcao que calcula a heuristica h para o a*
+    Distancia euclidiana -> sqrt((x-xf)^2 + (y-yf)^2)
+*/
+void Caminho::calcula_h(int x, int y) {
+    h1 = sqrt((c1.xf - v.x)*(c1.xf - v.x) + (c1.yf - v.y)*(c1.yf - v.y))
 }
 
  /* Sobrecarga da comparacao '<'
@@ -143,6 +153,7 @@ public:
     int DFS(int x, int y, Caminho& c, float passo);
     void BFS(int x, int y, Caminho& c);
     void Best_first_search(int x, int y, Caminho& c);
+    void a_estrela(int x, int y, Caminho& c);
 
 };
 
@@ -384,6 +395,8 @@ void Labirinto::BFS(int x, int y, Caminho& c) {
 
     COLOCAR NO RELATORIO: (apagar depois)
     nessa busca acha o menor por explorar o menor.
+    porem ele sempre explora o menor caminho atual, idependente de quao perto esse caminho esta do destino
+    assim ele visita muito mais vertices que a busca a*
 */            
 void Labirinto::Best_first_search(int x, int y, Caminho& c) {
 
@@ -496,6 +509,142 @@ void Labirinto::Best_first_search(int x, int y, Caminho& c) {
     }
 }
 
+/* Busca A*.
+    Parametros:
+        int x,y - vertice inical
+        caminho c - guarda o caminho final, vazio caso nao exista.
+
+    COLOCAR NO RELATORIO: (apagar depois)
+    ele busca pelo melhor caminho definido pelo menor valor f(x)
+    f(x) = g(x) + h(x)
+    onde g(x) = tamanho atual do caminho
+    e h(x) = { sqrt((x-xf)^2 + (y-yf)^2) } distancia euclidiana entre o vertice e o destino
+
+*/            
+void Labirinto::a_estrela(int x, int y, Caminho& c) {
+
+    Caminho aux_c;
+    Vertice vert;
+
+    // declara f(x)
+    auto f_comparacao = [](const Caminho c1, const Caminho c2) 
+        {
+            // calcular h(x) dos dois caminhos
+            Vertice v; // vertice auxiliar
+            v = c1.back();
+            float h1 = sqrt((c1.xf - v.x)*(c1.xf - v.x) + (c1.yf - v.y)*(c1.yf - v.y));
+
+            v = c1.back();
+            float h2 = sqrt((c1.xf - v.x)*(c1.xf - v.x) + (c1.yf - v.y)*(c1.yf - v.y));
+
+            return ((c1.tamanho + h1) > (c2.tamanho + h2));
+        };
+    // fila de prioridade com ordem crescente (menor fica no topo)
+    priority_queue<Caminho, vector<Caminho>, decltype(f_comparacao) > q;
+
+    aux_c.push_back(Vertice(x,y));
+    aux_c.calcula_h(this->xf, this->yf);
+    q.push(aux_c); // adiciona vertice inicial na fila
+    this->m[x][y] = 'v'; // marca como visitado
+    this->m[this->xf][this->yf] = '*'; // marca objetivo com nao visitado.
+
+    while(!q.empty()) {
+        // remove caminho atual.
+        aux_c = q.top();
+        vert = aux_c.back();
+        q.pop();
+
+        // verifica se terminou
+        if(vert.x == this->xf and vert.y == this->yf) {
+            this->m[vert.x][vert.y] = '$';
+            c = aux_c;
+            break;
+        }
+
+        // gera caminhos do aux_c
+        // Ordem (diagonal e horario): nordeste, sudeste, sudoeste, noroeste, cima, direita, baixo, esquerda
+        // adiciona diagonal nordeste na fila
+        if(vert.x-1 >= 0 and vert.y+1 < this->col and this->m[vert.x-1][vert.y+1] == '*' ) {
+            aux_c.push_back(Vertice(vert.x-1, vert.y+1));
+            aux_c.peso += RAIZ_2;
+            q.push(aux_c); // cria uma copia de aux em q
+            aux_c.pop_back();
+            aux_c.peso -= RAIZ_2;
+            this->m[vert.x-1][vert.y+1] = 'v'; // marca como visitado.
+        }
+        // adiciona diagonal sudeste na fila
+        if(vert.x+1 < this->lin and vert.y+1 < this->col and this->m[vert.x+1][vert.y+1] == '*' ) {
+            aux_c.push_back(Vertice(vert.x+1, vert.y+1));
+            aux_c.peso += RAIZ_2;
+            q.push(aux_c); // cria uma copia de aux em q
+            aux_c.pop_back();
+            aux_c.peso -= RAIZ_2;
+            this->m[vert.x+1][vert.y+1] = 'v'; // marca como visitado.
+        }
+        // adiciona diagonal sudoeste na fila
+        if(vert.x+1 < this->lin and vert.y-1 >= 0 and this->m[vert.x+1][vert.y-1] == '*' ) {
+            aux_c.push_back(Vertice(vert.x+1, vert.y-1));
+            aux_c.peso += RAIZ_2;
+            q.push(aux_c); // cria uma copia de aux em q
+            aux_c.pop_back();
+            aux_c.peso -= RAIZ_2;
+            this->m[vert.x+1][vert.y-1] = 'v'; // marca como visitado.
+        }
+        // adiciona diagonal noroeste na fila
+        if(vert.x-1 >= 0 and vert.y-1 >= 0 and this->m[vert.x-1][vert.y-1] == '*' ) {
+            aux_c.push_back(Vertice(vert.x-1, vert.y-1));
+            aux_c.peso += RAIZ_2;
+            q.push(aux_c); // cria uma copia de aux em q
+            aux_c.pop_back();
+            aux_c.peso -= RAIZ_2;
+            this->m[vert.x-1][vert.y-1] = 'v'; // marca como visitado.
+        }
+        
+        // Cima 
+        if(vert.x-1 >= 0 and this->m[vert.x-1][vert.y] == '*' ) {
+            aux_c.push_back(Vertice(vert.x-1, vert.y));
+            aux_c.peso += 1.0;
+            q.push(aux_c); // cria uma copia de aux em q
+            aux_c.peso -= 1.0;
+            aux_c.pop_back();
+            this->m[vert.x-1][vert.y] = 'v'; // marca como visitado.
+        }
+        // Direita
+        if(vert.y+1 < this->col and this->m[vert.x][vert.y+1] == '*' ) {
+            aux_c.push_back(Vertice(vert.x, vert.y+1));
+            aux_c.peso += 1.0;
+            q.push(aux_c); // cria uma copia de aux em q
+            aux_c.pop_back();
+            aux_c.peso -= 1.0;
+            this->m[vert.x][vert.y+1] = 'v'; // marca como visitado.
+        }
+        // Baixo 
+        if(vert.x+1 < this->lin and this->m[vert.x+1][vert.y] == '*' ) {
+            aux_c.push_back(Vertice(vert.x+1, vert.y));
+            aux_c.peso += 1.0;
+            q.push(aux_c); // cria uma copia de aux em q
+            aux_c.pop_back();
+            aux_c.peso -= 1.0;
+            this->m[vert.x+1][vert.y] = 'v'; // marca como visitado.
+        }
+        // Esquerda
+        if(vert.y-1 >= 0 and this->m[vert.x][vert.y-1] == '*' ) {
+            aux_c.push_back(Vertice(vert.x, vert.y-1));
+            aux_c.peso += 1.0;
+            q.push(aux_c); // cria uma copia de aux em q
+            aux_c.pop_back();
+            aux_c.peso -= 1.0;
+            this->m[vert.x][vert.y-1] = 'v'; // marca como visitado.
+        }
+    }
+    
+    // marca caminho percorrido no labiritno.
+    this->m[this->xi][this->yi] = '#';
+    for(int i = 1; i < c.tamanho -1; i++) {
+        vert = c.c[i];
+        this->m[vert.x][vert.y] = 'O';
+    }
+}
 
 /* ..:: Main ::.. */
 /*****************************************************************************************************/
