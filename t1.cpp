@@ -138,7 +138,7 @@ public:
 
     void le_entrada();
     void exibe();
-    int DFS(int x, int y, Caminho& c, float passo);
+    int DFS(int x, int y, Caminho& c, float passo, int ordem);
     void BFS(int x, int y, Caminho& c);
     void Best_first_search(int x, int y, Caminho& c);
     void a_estrela(int x, int y, Caminho& c);
@@ -180,6 +180,22 @@ void Labirinto::le_entrada() {
     }
 }
 
+/*
+
+* * * * * * * * * *
+* - - - - - - - - -
+* - * * * * * * * *
+* - * - - - - - - -
+* - * - * * * * * *
+* - * - 
+* - *
+* - *
+* - *
+* - *
+* - *
+
+*/
+
 void Labirinto::exibe() {
     for (int i = 0; i < this->lin; i++) {
         for (int j = 0; j < this->col; j++) {
@@ -194,6 +210,7 @@ void Labirinto::exibe() {
         x,y - posicao atual na busca
         caminho c - caminho atual percorrido, ira conter o caminho final caso tenha solucao
         float passo - peso do passo dado (diagonal, normal, comeco).
+        int ordem - ordem no caminho
     Retorno:
         1 - caminho atual alcanca o destino
         0 - caminho atual nao alcanca o destino
@@ -210,16 +227,20 @@ void Labirinto::exibe() {
 
     - caso nao tenha solucao, o caminho c retorna vazio.
 */
-int Labirinto::DFS(int x, int y, Caminho& c, float passo) {
+int Labirinto::DFS(int x, int y, Caminho& c, float passo, int ordem) {
+
+    if (ordem > 'z')
+        ordem = 'a';
 
     // verifica se x ou y estao fora do labirinto ou sao paredes ou ja foram percorridos.
-    if ((x < 0 or x >= this->lin) or (y < 0 or y >= this->col) or (this->m[x][y] == '-' or this->m[x][y] == 'O'))
+    //if ((x < 0 or x >= this->lin) or (y < 0 or y >= this->col) or (this->m[x][y] == '-' or this->m[x][y] == 'O'))
+    if ((x < 0 or x >= this->lin) or (y < 0 or y >= this->col) or (this->m[x][y] != '*'))
         return 0;
 
     // coloca (x,y) no caminho
     c.push_back(Vertice(x, y));
     c.peso += passo;
-    this->m[x][y] = 'O';
+    this->m[x][y] = ordem;
 
     if (x == this->xf and y == this->yf) {
         this->m[x][y] = '$';
@@ -229,22 +250,22 @@ int Labirinto::DFS(int x, int y, Caminho& c, float passo) {
     int r = 0;
     
     // Ordem (horario e diagonal):cima, direita, baixo, esquerda, nordeste, sudeste, sudoeste, noroeste
-    r = DFS(x-1, y, c, 1); // Cima
+    r = DFS(x-1, y, c, 1, ordem+1); // Cima
     if (r == 1) return 1;
-    r = DFS(x, y+1, c, 1); // Direita
+    r = DFS(x, y+1, c, 1, ordem+1); // Direita
     if (r == 1) return 1;
-    r = DFS(x+1, y, c, 1); // Baixo
+    r = DFS(x+1, y, c, 1, ordem+1); // Baixo
     if (r == 1) return 1;
-    r = DFS(x, y-1, c, 1); // Esquerda
+    r = DFS(x, y-1, c, 1, ordem+1); // Esquerda
     if (r == 1) return 1;
     
-    r = DFS(x-1, y+1, c, RAIZ_2); // diagonal nordeste
+    r = DFS(x-1, y+1, c, RAIZ_2, ordem+1); // diagonal nordeste
     if (r == 1) return 1;
-    r = DFS(x+1, y+1, c, RAIZ_2); // diagonal sudeste
+    r = DFS(x+1, y+1, c, RAIZ_2, ordem+1); // diagonal sudeste
     if (r == 1) return 1;
-    r = DFS(x+1, y-1, c, RAIZ_2); // diagonal sudoeste
+    r = DFS(x+1, y-1, c, RAIZ_2, ordem+1); // diagonal sudoeste
     if (r == 1) return 1;
-    r = DFS(x-1, y-1, c, RAIZ_2); // diagonal noroeste
+    r = DFS(x-1, y-1, c, RAIZ_2, ordem+1); // diagonal noroeste
     if (r == 1) return 1;
    
 
@@ -264,7 +285,7 @@ int Labirinto::DFS(int x, int y, Caminho& c, float passo) {
         caminho c - guarda o caminho final, vazio caso nao exista.
 
     COLOCAR NO RELATORIO: (*** APAGAR DEPOIS ***)
-    na BFS, todos os vertices visitados durante a execucao sao marcados no labirinto com a letra 'v',
+    na BFS, todos os vertices visitados durante a execucao sao marcados no labirinto com a letra '+',
     porem apenas o caminho final eh marcado com a letra 'O', assim como na DFS.
 */            
 void Labirinto::BFS(int x, int y, Caminho& c) {
@@ -275,7 +296,7 @@ void Labirinto::BFS(int x, int y, Caminho& c) {
 
     aux_c.push_back(Vertice(x,y));
     q.push(aux_c); // adiciona vertice inicial na fila
-    this->m[x][y] = 'v'; // marca como visitado
+    this->m[x][y] = '+'; // marca como visitado
     this->m[this->xf][this->yf] = '*'; // marca objetivo com nao visitado.
 
     while(!q.empty()) {
@@ -300,7 +321,7 @@ void Labirinto::BFS(int x, int y, Caminho& c) {
             q.push(aux_c); // cria uma copia de aux em q
             aux_c.pop_back();
             aux_c.peso -= RAIZ_2;
-            this->m[vert.x-1][vert.y+1] = 'v'; // marca como visitado.
+            this->m[vert.x-1][vert.y+1] = '+'; // marca como visitado.
         }
         // adiciona diagonal sudeste na fila
         if(vert.x+1 < this->lin and vert.y+1 < this->col and this->m[vert.x+1][vert.y+1] == '*' ) {
@@ -309,7 +330,7 @@ void Labirinto::BFS(int x, int y, Caminho& c) {
             q.push(aux_c); // cria uma copia de aux em q
             aux_c.pop_back();
             aux_c.peso -= RAIZ_2;
-            this->m[vert.x+1][vert.y+1] = 'v'; // marca como visitado.
+            this->m[vert.x+1][vert.y+1] = '+'; // marca como visitado.
         }
         // adiciona diagonal sudoeste na fila
         if(vert.x+1 < this->lin and vert.y-1 >= 0 and this->m[vert.x+1][vert.y-1] == '*' ) {
@@ -318,7 +339,7 @@ void Labirinto::BFS(int x, int y, Caminho& c) {
             q.push(aux_c); // cria uma copia de aux em q
             aux_c.pop_back();
             aux_c.peso -= RAIZ_2;
-            this->m[vert.x+1][vert.y-1] = 'v'; // marca como visitado.
+            this->m[vert.x+1][vert.y-1] = '+'; // marca como visitado.
         }
         // adiciona diagonal noroeste na fila
         if(vert.x-1 >= 0 and vert.y-1 >= 0 and this->m[vert.x-1][vert.y-1] == '*' ) {
@@ -327,7 +348,7 @@ void Labirinto::BFS(int x, int y, Caminho& c) {
             q.push(aux_c); // cria uma copia de aux em q
             aux_c.pop_back();
             aux_c.peso -= RAIZ_2;
-            this->m[vert.x-1][vert.y-1] = 'v'; // marca como visitado.
+            this->m[vert.x-1][vert.y-1] = '+'; // marca como visitado.
         }
         
         // Cima 
@@ -337,7 +358,7 @@ void Labirinto::BFS(int x, int y, Caminho& c) {
             q.push(aux_c); // cria uma copia de aux em q
             aux_c.peso -= 1.0;
             aux_c.pop_back();
-            this->m[vert.x-1][vert.y] = 'v'; // marca como visitado.
+            this->m[vert.x-1][vert.y] = '+'; // marca como visitado.
         }
         // Direita
         if(vert.y+1 < this->col and this->m[vert.x][vert.y+1] == '*' ) {
@@ -346,7 +367,7 @@ void Labirinto::BFS(int x, int y, Caminho& c) {
             q.push(aux_c); // cria uma copia de aux em q
             aux_c.pop_back();
             aux_c.peso -= 1.0;
-            this->m[vert.x][vert.y+1] = 'v'; // marca como visitado.
+            this->m[vert.x][vert.y+1] = '+'; // marca como visitado.
         }
         // Baixo 
         if(vert.x+1 < this->lin and this->m[vert.x+1][vert.y] == '*' ) {
@@ -355,7 +376,7 @@ void Labirinto::BFS(int x, int y, Caminho& c) {
             q.push(aux_c); // cria uma copia de aux em q
             aux_c.pop_back();
             aux_c.peso -= 1.0;
-            this->m[vert.x+1][vert.y] = 'v'; // marca como visitado.
+            this->m[vert.x+1][vert.y] = '+'; // marca como visitado.
         }
         // Esquerda
         if(vert.y-1 >= 0 and this->m[vert.x][vert.y-1] == '*' ) {
@@ -364,7 +385,7 @@ void Labirinto::BFS(int x, int y, Caminho& c) {
             q.push(aux_c); // cria uma copia de aux em q
             aux_c.pop_back();
             aux_c.peso -= 1.0;
-            this->m[vert.x][vert.y-1] = 'v'; // marca como visitado.
+            this->m[vert.x][vert.y-1] = '+'; // marca como visitado.
         }
     }
     
@@ -397,7 +418,7 @@ void Labirinto::Best_first_search(int x, int y, Caminho& c) {
 
     aux_c.push_back(Vertice(x,y));
     q.push(aux_c); // adiciona vertice inicial na fila
-    this->m[x][y] = 'v'; // marca como visitado
+    this->m[x][y] = '+'; // marca como visitado
     this->m[this->xf][this->yf] = '*'; // marca objetivo com nao visitado.
 
     while(!q.empty()) {
@@ -422,7 +443,7 @@ void Labirinto::Best_first_search(int x, int y, Caminho& c) {
             q.push(aux_c); // cria uma copia de aux em q
             aux_c.pop_back();
             aux_c.peso -= RAIZ_2;
-            this->m[vert.x-1][vert.y+1] = 'v'; // marca como visitado.
+            this->m[vert.x-1][vert.y+1] = '+'; // marca como visitado.
         }
         // adiciona diagonal sudeste na fila
         if(vert.x+1 < this->lin and vert.y+1 < this->col and this->m[vert.x+1][vert.y+1] == '*' ) {
@@ -431,7 +452,7 @@ void Labirinto::Best_first_search(int x, int y, Caminho& c) {
             q.push(aux_c); // cria uma copia de aux em q
             aux_c.pop_back();
             aux_c.peso -= RAIZ_2;
-            this->m[vert.x+1][vert.y+1] = 'v'; // marca como visitado.
+            this->m[vert.x+1][vert.y+1] = '+'; // marca como visitado.
         }
         // adiciona diagonal sudoeste na fila
         if(vert.x+1 < this->lin and vert.y-1 >= 0 and this->m[vert.x+1][vert.y-1] == '*' ) {
@@ -440,7 +461,7 @@ void Labirinto::Best_first_search(int x, int y, Caminho& c) {
             q.push(aux_c); // cria uma copia de aux em q
             aux_c.pop_back();
             aux_c.peso -= RAIZ_2;
-            this->m[vert.x+1][vert.y-1] = 'v'; // marca como visitado.
+            this->m[vert.x+1][vert.y-1] = '+'; // marca como visitado.
         }
         // adiciona diagonal noroeste na fila
         if(vert.x-1 >= 0 and vert.y-1 >= 0 and this->m[vert.x-1][vert.y-1] == '*' ) {
@@ -449,7 +470,7 @@ void Labirinto::Best_first_search(int x, int y, Caminho& c) {
             q.push(aux_c); // cria uma copia de aux em q
             aux_c.pop_back();
             aux_c.peso -= RAIZ_2;
-            this->m[vert.x-1][vert.y-1] = 'v'; // marca como visitado.
+            this->m[vert.x-1][vert.y-1] = '+'; // marca como visitado.
         }
         
         // Cima 
@@ -459,7 +480,7 @@ void Labirinto::Best_first_search(int x, int y, Caminho& c) {
             q.push(aux_c); // cria uma copia de aux em q
             aux_c.peso -= 1.0;
             aux_c.pop_back();
-            this->m[vert.x-1][vert.y] = 'v'; // marca como visitado.
+            this->m[vert.x-1][vert.y] = '+'; // marca como visitado.
         }
         // Direita
         if(vert.y+1 < this->col and this->m[vert.x][vert.y+1] == '*' ) {
@@ -468,7 +489,7 @@ void Labirinto::Best_first_search(int x, int y, Caminho& c) {
             q.push(aux_c); // cria uma copia de aux em q
             aux_c.pop_back();
             aux_c.peso -= 1.0;
-            this->m[vert.x][vert.y+1] = 'v'; // marca como visitado.
+            this->m[vert.x][vert.y+1] = '+'; // marca como visitado.
         }
         // Baixo 
         if(vert.x+1 < this->lin and this->m[vert.x+1][vert.y] == '*' ) {
@@ -477,7 +498,7 @@ void Labirinto::Best_first_search(int x, int y, Caminho& c) {
             q.push(aux_c); // cria uma copia de aux em q
             aux_c.pop_back();
             aux_c.peso -= 1.0;
-            this->m[vert.x+1][vert.y] = 'v'; // marca como visitado.
+            this->m[vert.x+1][vert.y] = '+'; // marca como visitado.
         }
         // Esquerda
         if(vert.y-1 >= 0 and this->m[vert.x][vert.y-1] == '*' ) {
@@ -486,7 +507,7 @@ void Labirinto::Best_first_search(int x, int y, Caminho& c) {
             q.push(aux_c); // cria uma copia de aux em q
             aux_c.pop_back();
             aux_c.peso -= 1.0;
-            this->m[vert.x][vert.y-1] = 'v'; // marca como visitado.
+            this->m[vert.x][vert.y-1] = '+'; // marca como visitado.
         }
     }
     
@@ -527,7 +548,7 @@ void Labirinto::a_estrela(int x, int y, Caminho& c) {
     aux_c.push_back(Vertice(x,y));
     aux_c.calcula_h(this->xf, this->yf);
     q.push(aux_c); // adiciona vertice inicial na fila
-    this->m[x][y] = 'v'; // marca como visitado
+    this->m[x][y] = '+'; // marca como visitado
     this->m[this->xf][this->yf] = '*'; // marca objetivo com nao visitado.
 
     while(!q.empty()) {
@@ -553,7 +574,7 @@ void Labirinto::a_estrela(int x, int y, Caminho& c) {
             q.push(aux_c); // cria uma copia de aux em q
             aux_c.pop_back();
             aux_c.peso -= RAIZ_2;
-            this->m[vert.x-1][vert.y+1] = 'v'; // marca como visitado.
+            this->m[vert.x-1][vert.y+1] = '+'; // marca como visitado.
         }
         // adiciona diagonal sudeste na fila
         if(vert.x+1 < this->lin and vert.y+1 < this->col and this->m[vert.x+1][vert.y+1] == '*' ) {
@@ -563,7 +584,7 @@ void Labirinto::a_estrela(int x, int y, Caminho& c) {
             q.push(aux_c); // cria uma copia de aux em q
             aux_c.pop_back();
             aux_c.peso -= RAIZ_2;
-            this->m[vert.x+1][vert.y+1] = 'v'; // marca como visitado.
+            this->m[vert.x+1][vert.y+1] = '+'; // marca como visitado.
         }
         // adiciona diagonal sudoeste na fila
         if(vert.x+1 < this->lin and vert.y-1 >= 0 and this->m[vert.x+1][vert.y-1] == '*' ) {
@@ -573,7 +594,7 @@ void Labirinto::a_estrela(int x, int y, Caminho& c) {
             q.push(aux_c); // cria uma copia de aux em q
             aux_c.pop_back();
             aux_c.peso -= RAIZ_2;
-            this->m[vert.x+1][vert.y-1] = 'v'; // marca como visitado.
+            this->m[vert.x+1][vert.y-1] = '+'; // marca como visitado.
         }
         // adiciona diagonal noroeste na fila
         if(vert.x-1 >= 0 and vert.y-1 >= 0 and this->m[vert.x-1][vert.y-1] == '*' ) {
@@ -583,7 +604,7 @@ void Labirinto::a_estrela(int x, int y, Caminho& c) {
             q.push(aux_c); // cria uma copia de aux em q
             aux_c.pop_back();
             aux_c.peso -= RAIZ_2;
-            this->m[vert.x-1][vert.y-1] = 'v'; // marca como visitado.
+            this->m[vert.x-1][vert.y-1] = '+'; // marca como visitado.
         }
         
         // Cima 
@@ -594,7 +615,7 @@ void Labirinto::a_estrela(int x, int y, Caminho& c) {
             q.push(aux_c); // cria uma copia de aux em q
             aux_c.peso -= 1.0;
             aux_c.pop_back();
-            this->m[vert.x-1][vert.y] = 'v'; // marca como visitado.
+            this->m[vert.x-1][vert.y] = '+'; // marca como visitado.
         }
         // Direita
         if(vert.y+1 < this->col and this->m[vert.x][vert.y+1] == '*' ) {
@@ -604,7 +625,7 @@ void Labirinto::a_estrela(int x, int y, Caminho& c) {
             q.push(aux_c); // cria uma copia de aux em q
             aux_c.pop_back();
             aux_c.peso -= 1.0;
-            this->m[vert.x][vert.y+1] = 'v'; // marca como visitado.
+            this->m[vert.x][vert.y+1] = '+'; // marca como visitado.
         }
         // Baixo 
         if(vert.x+1 < this->lin and this->m[vert.x+1][vert.y] == '*' ) {
@@ -614,7 +635,7 @@ void Labirinto::a_estrela(int x, int y, Caminho& c) {
             q.push(aux_c); // cria uma copia de aux em q
             aux_c.pop_back();
             aux_c.peso -= 1.0;
-            this->m[vert.x+1][vert.y] = 'v'; // marca como visitado.
+            this->m[vert.x+1][vert.y] = '+'; // marca como visitado.
         }
         // Esquerda
         if(vert.y-1 >= 0 and this->m[vert.x][vert.y-1] == '*' ) {
@@ -624,7 +645,7 @@ void Labirinto::a_estrela(int x, int y, Caminho& c) {
             q.push(aux_c); // cria uma copia de aux em q
             aux_c.pop_back();
             aux_c.peso -= 1.0;
-            this->m[vert.x][vert.y-1] = 'v'; // marca como visitado.
+            this->m[vert.x][vert.y-1] = '+'; // marca como visitado.
         }
     }
     
@@ -639,7 +660,6 @@ void Labirinto::a_estrela(int x, int y, Caminho& c) {
 /* ..:: Main ::.. */
 /*****************************************************************************************************/
 
-
 int main(int argc, char const **argv) {
     
     Labirinto lab;
@@ -648,7 +668,7 @@ int main(int argc, char const **argv) {
 
     Caminho c;
 
-    // lab.DFS(lab.xi, lab.yi, c, 0);
+    // lab.DFS(lab.xi, lab.yi, c, 0, 'a');
     // cout << "teminou dfs" << endl;
     
     // lab.BFS(lab.xi, lab.yi, c);
