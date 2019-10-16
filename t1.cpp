@@ -103,6 +103,7 @@ public:
     void le_entrada();
     void exibe_labirinto();
     int DFS(int x, int y, Caminho& c, float passo);
+    void BFS(int x, int y, Caminho& c);
 
 };
 
@@ -153,7 +154,7 @@ void Labirinto::exibe_labirinto() {
 /* Busca em Profundidade recursiva.
     Parametros:
         x,y - posicao atual na busca
-        caminho c - caminho atual percorrido
+        caminho c - caminho atual percorrido, ira conter o caminho final caso tenha solucao
         float passo - peso do passo dado (diagonal, normal, comeco).
 */
 /* ****APAGAR DEPOIS
@@ -166,6 +167,7 @@ void Labirinto::exibe_labirinto() {
         -> faz com que o caminho seja menor, mas nao necessariamente menor peso
     - sentido horario
 
+    - caso nao tenha solucao, o caminho c retorna vazio.
 */
 int Labirinto::DFS(int x, int y, Caminho& c, float passo) {
 
@@ -178,8 +180,9 @@ int Labirinto::DFS(int x, int y, Caminho& c, float passo) {
     c.peso += passo;
     this->m[x][y] = 'O';
 
-    if(x == this->xf and y == this->yf){
+    if (x == this->xf and y == this->yf) {
         this->m[x][y] = '$';
+        this->m[this->xi][this->yi] = '#';
         return 1;
     }
     int r = 0;
@@ -207,9 +210,39 @@ int Labirinto::DFS(int x, int y, Caminho& c, float passo) {
     c.pop_back();
     c.peso -= passo;
     this->m[x][y] = '*';
+    if(c.tamanho == 0) // caso onde nao existe caminho da origem ate o destino
+        this->m[x][y] = '#'; // remove status de visitado da origem
+    
     return 0;
 }
 
+/*
+procedure BFS(G,start_v):
+      let Q be a queue
+      label start_v as discovered
+      Q.enqueue(start_v)
+      while Q is not empty
+          v = Q.dequeue()
+          if v is the goal:
+              return v
+          for all edges from v to w in G.adjacentEdges(v) do
+             if w is not labeled as discovered:
+                 label w as discovered
+                 w.parent = v
+                 Q.enqueue(w) 
+*/
+/* Busca em largura iterativa.
+    Parametros:
+        int x,y - vertice inical
+        caminho c - guarda o caminho final, vazio caso nao exista.
+*/            
+void Labirinto::BFS(int x, int y, Caminho& c) {
+    queue<Caminho> q;
+
+    fila: [ [(0, 3)] ]
+          [ [(0, 3), (0, 4)], [(0, 3), (1, 3)] ]
+    
+}
 
 /* ..:: Main ::.. */
 /*****************************************************************************************************/
