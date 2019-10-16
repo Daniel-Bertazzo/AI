@@ -27,6 +27,7 @@ public:
     Vertice(int x, int y);
     void set_x(int x);
     void set_y(int y);
+    void exibe();
 };
 
 Vertice::Vertice() {
@@ -47,6 +48,10 @@ void Vertice::set_y(int y) {
     this->y = y;
 }
 
+void Vertice::exibe() {
+    cout << "x: " << this->x << ", y: " << this->y << endl;
+}
+
 
 /* ..:: Classe Caminho ::.. */
 /*****************************************************************************************************/
@@ -60,7 +65,7 @@ public:
 
     Caminho();
     void push_back(Vertice v);
-    void exibe_caminho();
+    void exibe();
     void pop_back();
     Vertice back();
 };
@@ -75,7 +80,7 @@ void Caminho::push_back(Vertice v) {
     this->tamanho++;
 }
 
-void Caminho::exibe_caminho() {
+void Caminho::exibe() {
     cout << "tamanho: " << this->tamanho << ", peso: " << this->peso << endl << "[ ";
     for (int i = 0; i < this->tamanho; i++) {
         cout << "(" << this->c[i].x << ", " << this->c[i].y << ") ";
@@ -108,7 +113,7 @@ public:
     Labirinto();
 
     void le_entrada();
-    void exibe_labirinto();
+    void exibe();
     int DFS(int x, int y, Caminho& c, float passo);
     void BFS(int x, int y, Caminho& c);
 
@@ -149,7 +154,7 @@ void Labirinto::le_entrada() {
     }
 }
 
-void Labirinto::exibe_labirinto() {
+void Labirinto::exibe() {
     for (int i = 0; i < this->lin; i++) {
         for (int j = 0; j < this->col; j++) {
             cout << this->m[i][j];
@@ -245,6 +250,10 @@ procedure BFS(G,start_v):
     Parametros:
         int x,y - vertice inical
         caminho c - guarda o caminho final, vazio caso nao exista.
+
+    COLOCAR NO RELATORIO: (apagar depois)
+    na BFS, todos os vertices visitados durante a execucao sao marcados no labirinto com a letra 'v',
+    porem apenas o caminho final eh marcado com a letra 'O', assim como na DFS.
 */            
 void Labirinto::BFS(int x, int y, Caminho& c) {
 
@@ -257,8 +266,9 @@ void Labirinto::BFS(int x, int y, Caminho& c) {
     aux_c.push_back(Vertice(x,y));
     q.push(aux_c); // adiciona vertice inicial na fila
     this->m[x][y] = 'v'; // marca como visitado
+    this->m[this->xf][this->yf] = '*'; // marca objetivo com nao visitado.
 
-    while (!q.empty()) {
+    while(!q.empty()) {
         // remove caminho atual.
         aux_c = q.front();
         vert = aux_c.back();
@@ -266,39 +276,94 @@ void Labirinto::BFS(int x, int y, Caminho& c) {
 
         // verifica se terminou
         if(vert.x == this->xf and vert.y == this->yf) {
+            cout << "ACHOU TUDO" << endl;
+            this->m[vert.x][vert.y] = '$';
             c = aux_c;
+            break;
         }
 
         // gera caminhos do aux_c
         // Ordem (diagonal e horario): nordeste, sudeste, sudoeste, noroeste, cima, direita, baixo, esquerda
         // adiciona diagonal nordeste na fila
-        if(vert.x-1 >= 0 and vert.y+1 < this->col and this->m[vert.x][vert.y] == '*' ) {
+        if(vert.x-1 >= 0 and vert.y+1 < this->col and this->m[vert.x-1][vert.y+1] == '*' ) {
             aux_c.push_back(Vertice(vert.x-1, vert.y+1));
+            aux_c.peso += RAIZ_2;
             q.push(aux_c); // cria uma copia de aux em q
             aux_c.pop_back();
-            this->m[vert.x][vert.y] = 'v'; // marca como visitado.
+            aux_c.peso -= RAIZ_2;
+            this->m[vert.x-1][vert.y+1] = 'v'; // marca como visitado.
         }
         // adiciona diagonal sudeste na fila
-        if(vert.x+1 < this->lin and vert.y+1 < this->col and this->m[vert.x][vert.y] == '*' ) {
+        if(vert.x+1 < this->lin and vert.y+1 < this->col and this->m[vert.x+1][vert.y+1] == '*' ) {
             aux_c.push_back(Vertice(vert.x+1, vert.y+1));
+            aux_c.peso += RAIZ_2;
             q.push(aux_c); // cria uma copia de aux em q
             aux_c.pop_back();
-            this->m[vert.x][vert.y] = 'v'; // marca como visitado.
+            aux_c.peso -= RAIZ_2;
+            this->m[vert.x+1][vert.y+1] = 'v'; // marca como visitado.
         }
         // adiciona diagonal sudoeste na fila
-        if(vert.x+1 < this->lin and vert.y-1 >= 0 and this->m[vert.x][vert.y] == '*' ) {
+        if(vert.x+1 < this->lin and vert.y-1 >= 0 and this->m[vert.x+1][vert.y-1] == '*' ) {
             aux_c.push_back(Vertice(vert.x+1, vert.y-1));
+            aux_c.peso += RAIZ_2;
             q.push(aux_c); // cria uma copia de aux em q
             aux_c.pop_back();
-            this->m[vert.x][vert.y] = 'v'; // marca como visitado.
+            aux_c.peso -= RAIZ_2;
+            this->m[vert.x+1][vert.y-1] = 'v'; // marca como visitado.
         }
         // adiciona diagonal noroeste na fila
-        if(vert.x-1 >= 0 and vert.y-1 >= 0 and this->m[vert.x][vert.y] == '*' ) {
+        if(vert.x-1 >= 0 and vert.y-1 >= 0 and this->m[vert.x-1][vert.y-1] == '*' ) {
             aux_c.push_back(Vertice(vert.x-1, vert.y-1));
+            aux_c.peso += RAIZ_2;
             q.push(aux_c); // cria uma copia de aux em q
             aux_c.pop_back();
-            this->m[vert.x][vert.y] = 'v'; // marca como visitado.
+            aux_c.peso -= RAIZ_2;
+            this->m[vert.x-1][vert.y-1] = 'v'; // marca como visitado.
         }
+        
+        // Cima 
+        if(vert.x-1 >= 0 and this->m[vert.x-1][vert.y] == '*' ) {
+            aux_c.push_back(Vertice(vert.x-1, vert.y));
+            aux_c.peso += 1.0;
+            q.push(aux_c); // cria uma copia de aux em q
+            aux_c.peso -= 1.0;
+            aux_c.pop_back();
+            this->m[vert.x-1][vert.y] = 'v'; // marca como visitado.
+        }
+        // Direita
+        if(vert.y+1 < this->col and this->m[vert.x][vert.y+1] == '*' ) {
+            aux_c.push_back(Vertice(vert.x, vert.y+1));
+            aux_c.peso += 1.0;
+            q.push(aux_c); // cria uma copia de aux em q
+            aux_c.pop_back();
+            aux_c.peso -= 1.0;
+            this->m[vert.x][vert.y+1] = 'v'; // marca como visitado.
+        }
+        // Baixo 
+        if(vert.x+1 < this->lin and this->m[vert.x+1][vert.y] == '*' ) {
+            aux_c.push_back(Vertice(vert.x+1, vert.y));
+            aux_c.peso += 1.0;
+            q.push(aux_c); // cria uma copia de aux em q
+            aux_c.pop_back();
+            aux_c.peso -= 1.0;
+            this->m[vert.x+1][vert.y] = 'v'; // marca como visitado.
+        }
+        // Esquerda
+        if(vert.y-1 >= 0 and this->m[vert.x][vert.y-1] == '*' ) {
+            aux_c.push_back(Vertice(vert.x, vert.y-1));
+            aux_c.peso += 1.0;
+            q.push(aux_c); // cria uma copia de aux em q
+            aux_c.pop_back();
+            aux_c.peso -= 1.0;
+            this->m[vert.x][vert.y-1] = 'v'; // marca como visitado.
+        }
+    }
+    
+    // marca caminho percorrido no labiritno.
+    this->m[this->xi][this->yi] = '#';
+    for(int i = 1; i < c.tamanho -1; i++) {
+        vert = c.c[i];
+        this->m[vert.x][vert.y] = 'O';
     }
 }
 
@@ -311,7 +376,7 @@ int main(int argc, char const **argv) {
     
     Labirinto lab;
     lab.le_entrada();
-    lab.exibe_labirinto();
+    lab.exibe();
 
     Caminho c;
 
@@ -321,8 +386,8 @@ int main(int argc, char const **argv) {
     lab.BFS(lab.xi, lab.yi, c);
     cout << "teminou bfs" << endl;
     
-    c.exibe_caminho();
-    lab.exibe_labirinto();
+    c.exibe();
+    lab.exibe();
 
     return 0;
 }
