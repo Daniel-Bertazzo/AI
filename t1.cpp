@@ -82,6 +82,7 @@ public:
 Caminho::Caminho() {
     this->tamanho = 0;
     this->peso = 0.0;
+    this->h = 0.0;
 }
 
 void Caminho::push_back(Vertice v) {
@@ -112,7 +113,8 @@ Vertice Caminho::back() const{
     Distancia euclidiana -> sqrt((x-xf)^2 + (y-yf)^2)
 */
 void Caminho::calcula_h(int x, int y) {
-    h1 = sqrt((c1.xf - v.x)*(c1.xf - v.x) + (c1.yf - v.y)*(c1.yf - v.y))
+    Vertice aux = this->back();
+    this->h = sqrt((aux.x - x)*(aux.x - x) + (aux.y - y)*(aux.y - y));
 }
 
  /* Sobrecarga da comparacao '<'
@@ -121,24 +123,14 @@ bool Caminho::operator< (const Caminho& c2) const {
     return this->peso < c2.peso;
 }
 
-// bool Caminho::operator< (const Caminho& c1, const Caminho& c2) {
-//     return c1.peso < c2.peso;
-// }
-
-// bool operator> (const Caminho& c1, const Caminho& c2) {
-//     return c1.peso > c2.peso;
-// }
-
  /* Sobrecarga da comparacao '>'
  */
 bool Caminho::operator> (const Caminho& c2) const {
     return this->peso > c2.peso;
 }
 
-
 /* ..:: Classe Labirinto ::.. */
 /*****************************************************************************************************/
-
 
 class Labirinto {
 public:
@@ -527,20 +519,17 @@ void Labirinto::a_estrela(int x, int y, Caminho& c) {
     Vertice vert;
 
     // declara f(x)
-    auto f_comparacao = [](const Caminho c1, const Caminho c2) 
+    auto f_comparacao = [](const Caminho& c1, const Caminho& c2) 
         {
-            // calcular h(x) dos dois caminhos
-            Vertice v; // vertice auxiliar
-            v = c1.back();
-            float h1 = sqrt((c1.xf - v.x)*(c1.xf - v.x) + (c1.yf - v.y)*(c1.yf - v.y));
-
-            v = c1.back();
-            float h2 = sqrt((c1.xf - v.x)*(c1.xf - v.x) + (c1.yf - v.y)*(c1.yf - v.y));
-
-            return ((c1.tamanho + h1) > (c2.tamanho + h2));
+            return ((c1.peso + c1.h) > (c2.peso + c2.h));
         };
+    // auto my_comp =
+    //     [](const my_pair_t& e1, const my_pair_t& e2) 
+    //     { return e1.first > e2.first; };
+    // std::priority_queue<my_pair_t,my_container_t,decltype(my_comp)> queue(my_comp);
+
     // fila de prioridade com ordem crescente (menor fica no topo)
-    priority_queue<Caminho, vector<Caminho>, decltype(f_comparacao) > q;
+    priority_queue<Caminho, vector<Caminho>, decltype(f_comparacao) > q(f_comparacao);
 
     aux_c.push_back(Vertice(x,y));
     aux_c.calcula_h(this->xf, this->yf);
@@ -567,6 +556,7 @@ void Labirinto::a_estrela(int x, int y, Caminho& c) {
         if(vert.x-1 >= 0 and vert.y+1 < this->col and this->m[vert.x-1][vert.y+1] == '*' ) {
             aux_c.push_back(Vertice(vert.x-1, vert.y+1));
             aux_c.peso += RAIZ_2;
+            aux_c.calcula_h(this->xf, this->yf);
             q.push(aux_c); // cria uma copia de aux em q
             aux_c.pop_back();
             aux_c.peso -= RAIZ_2;
@@ -576,6 +566,7 @@ void Labirinto::a_estrela(int x, int y, Caminho& c) {
         if(vert.x+1 < this->lin and vert.y+1 < this->col and this->m[vert.x+1][vert.y+1] == '*' ) {
             aux_c.push_back(Vertice(vert.x+1, vert.y+1));
             aux_c.peso += RAIZ_2;
+            aux_c.calcula_h(this->xf, this->yf);
             q.push(aux_c); // cria uma copia de aux em q
             aux_c.pop_back();
             aux_c.peso -= RAIZ_2;
@@ -585,6 +576,7 @@ void Labirinto::a_estrela(int x, int y, Caminho& c) {
         if(vert.x+1 < this->lin and vert.y-1 >= 0 and this->m[vert.x+1][vert.y-1] == '*' ) {
             aux_c.push_back(Vertice(vert.x+1, vert.y-1));
             aux_c.peso += RAIZ_2;
+            aux_c.calcula_h(this->xf, this->yf);
             q.push(aux_c); // cria uma copia de aux em q
             aux_c.pop_back();
             aux_c.peso -= RAIZ_2;
@@ -594,6 +586,7 @@ void Labirinto::a_estrela(int x, int y, Caminho& c) {
         if(vert.x-1 >= 0 and vert.y-1 >= 0 and this->m[vert.x-1][vert.y-1] == '*' ) {
             aux_c.push_back(Vertice(vert.x-1, vert.y-1));
             aux_c.peso += RAIZ_2;
+            aux_c.calcula_h(this->xf, this->yf);
             q.push(aux_c); // cria uma copia de aux em q
             aux_c.pop_back();
             aux_c.peso -= RAIZ_2;
@@ -604,6 +597,7 @@ void Labirinto::a_estrela(int x, int y, Caminho& c) {
         if(vert.x-1 >= 0 and this->m[vert.x-1][vert.y] == '*' ) {
             aux_c.push_back(Vertice(vert.x-1, vert.y));
             aux_c.peso += 1.0;
+            aux_c.calcula_h(this->xf, this->yf);
             q.push(aux_c); // cria uma copia de aux em q
             aux_c.peso -= 1.0;
             aux_c.pop_back();
@@ -613,6 +607,7 @@ void Labirinto::a_estrela(int x, int y, Caminho& c) {
         if(vert.y+1 < this->col and this->m[vert.x][vert.y+1] == '*' ) {
             aux_c.push_back(Vertice(vert.x, vert.y+1));
             aux_c.peso += 1.0;
+            aux_c.calcula_h(this->xf, this->yf);
             q.push(aux_c); // cria uma copia de aux em q
             aux_c.pop_back();
             aux_c.peso -= 1.0;
@@ -622,6 +617,7 @@ void Labirinto::a_estrela(int x, int y, Caminho& c) {
         if(vert.x+1 < this->lin and this->m[vert.x+1][vert.y] == '*' ) {
             aux_c.push_back(Vertice(vert.x+1, vert.y));
             aux_c.peso += 1.0;
+            aux_c.calcula_h(this->xf, this->yf);
             q.push(aux_c); // cria uma copia de aux em q
             aux_c.pop_back();
             aux_c.peso -= 1.0;
@@ -631,6 +627,7 @@ void Labirinto::a_estrela(int x, int y, Caminho& c) {
         if(vert.y-1 >= 0 and this->m[vert.x][vert.y-1] == '*' ) {
             aux_c.push_back(Vertice(vert.x, vert.y-1));
             aux_c.peso += 1.0;
+            aux_c.calcula_h(this->xf, this->yf);
             q.push(aux_c); // cria uma copia de aux em q
             aux_c.pop_back();
             aux_c.peso -= 1.0;
@@ -664,8 +661,11 @@ int main(int argc, char const **argv) {
     // lab.BFS(lab.xi, lab.yi, c);
     // cout << "teminou bfs" << endl;
     
-    lab.Best_first_search(lab.xi, lab.yi, c);
-    cout << "terminou best first" << endl;
+    // lab.Best_first_search(lab.xi, lab.yi, c);
+    // cout << "terminou best first" << endl;
+
+    lab.a_estrela(lab.xi, lab.yi, c);
+    cout << "terminou a*" << endl;
 
     c.exibe();
     lab.exibe();

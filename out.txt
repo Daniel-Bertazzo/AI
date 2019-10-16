@@ -11,19 +11,19 @@
 **-************
 **-*****-***$**
 **-*****-******
-terminou best first
+terminou a*
 tamanho: 24, peso: 27.5563
-[ (0, 3) (0, 4) (0, 5) (0, 6) (0, 7) (0, 8) (0, 9) (0, 10) (0, 11) (1, 12) (2, 13) (3, 12) (3, 11) (4, 10) (5, 9) (6, 8) (7, 7) (8, 6) (9, 7) (9, 8) (9, 9) (9, 10) (10, 11) (11, 12) ]
-vvv#OOOOOOOOvvv
-vvvvvvvvvvvvOvv
+[ (0, 3) (1, 4) (1, 5) (1, 6) (1, 7) (1, 8) (1, 9) (1, 10) (1, 11) (1, 12) (2, 13) (3, 12) (4, 11) (5, 10) (6, 9) (7, 8) (7, 7) (8, 6) (9, 7) (9, 8) (10, 9) (10, 10) (11, 11) (11, 12) ]
+vvv#vvvvvvvvvvv
+vvvvOOOOOOOOOvv
 -------------Ov
-vvvvvvvvvvvOOvv
-vvvvvvvvvvOvvvv
-vvvvvvvvvOvvvvv
-vvvvvvvvOvvvvvv
-vv-vvvvOvvvvvvv
-vv-vvvO--------
-vv-vvvvOOOOvvv*
-vv-vvvvvvvvOvv*
-**-vvvvv-vvv$v*
-**-vvvvv-vvvv**
+*******vvvvvOvv
+******vvvvvOvvv
+******vvvvOvvvv
+*****vvvvOvvvvv
+**-**vvOOvvvvvv
+**-**vO--------
+**-**vvOOvvv***
+**-***vvvOOvv**
+**-****v-vvO$**
+**-*****-vvvv**
