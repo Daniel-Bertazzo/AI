@@ -199,7 +199,18 @@ void Labirinto::le_entrada() {
 void Labirinto::exibe() {
     for (int i = 0; i < this->lin; i++) {
         for (int j = 0; j < this->col; j++) {
-            cout << this->m[i][j];
+            if (this->m[i][j] == '-')
+                cout << "\033[1;41m-\033[0m";
+            else if (this->m[i][j] == '#')
+                cout << "\033[1;46m#\033[0m";
+            else if (this->m[i][j] == '$')
+                cout << "\033[1;42m$\033[0m";
+            else if (this->m[i][j] == 'O')
+                cout << "\033[1;33mO\033[0m";
+            else if (this->m[i][j] == '+')
+                cout << "\033[21;33m+\033[0m";
+            else
+                cout << this->m[i][j];
         }    
         cout << endl;
     }
@@ -664,7 +675,10 @@ int main(int argc, char const **argv) {
     
     Labirinto lab;
     lab.le_entrada();
+    cout << "Labirinto a ser explorado:" << endl << endl;
     lab.exibe();
+    cout << endl << "-------------------------------------------------------------------------";
+    cout << endl << endl;
 
     Caminho c;
 
@@ -678,10 +692,17 @@ int main(int argc, char const **argv) {
     // cout << "terminou best first" << endl;
 
     lab.a_estrela(lab.xi, lab.yi, c);
-    cout << "terminou a*" << endl;
+    cout << "terminou A*" << endl;
 
+    cout << "Caminho final:" << endl << endl;
     c.exibe();
+    cout << endl << "-------------------------------------------------------------------------";
+    cout << endl << endl << endl;
+
+    cout << "Labirinto apos execucao:" << endl << endl;
     lab.exibe();
+    cout << endl << "-------------------------------------------------------------------------";
+    cout << endl << endl;
 
     return 0;
 }
