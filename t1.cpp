@@ -139,6 +139,7 @@ public:
 
     void le_entrada();
     void exibe();
+    void exibe_sem_cor();
     int DFS(int x, int y, Caminho& c, float passo, char ordem);
     void BFS(int x, int y, Caminho& c);
     void Best_first_search(int x, int y, Caminho& c);
@@ -203,6 +204,15 @@ void Labirinto::exibe() {
             else if (this->m[i][j] >= 'a' and this->m[i][j] <= 'z')
                 printf("\033[1;33m%c\033[0m", this->m[i][j]);
             else
+                cout << this->m[i][j];
+        }    
+        cout << endl;
+    }
+}
+
+void Labirinto::exibe_sem_cor() {
+    for (int i = 0; i < this->lin; i++) {
+        for (int j = 0; j < this->col; j++) {
                 cout << this->m[i][j];
         }    
         cout << endl;
