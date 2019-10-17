@@ -181,21 +181,11 @@ void Labirinto::le_entrada() {
 }
 
 /*
-
-* * * * * * * * * *
-* - - - - - - - - -
-* - * * * * * * * *
-* - * - - - - - - -
-* - * - * * * * * *
-* - * - 
-* - *
-* - *
-* - *
-* - *
-* - *
-
+    **** APAGAR DEPOIS -> COLOCAR NO RELATORIO ****
+    Impressao do labirinto:
+    Foi usado o ANSI color code para imprimir cores diferentes para cada componente
+    do labirinto (parede, origem, objetivo, caminho final, pontos visitados)
 */
-
 void Labirinto::exibe() {
     for (int i = 0; i < this->lin; i++) {
         for (int j = 0; j < this->col; j++) {
