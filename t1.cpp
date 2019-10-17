@@ -12,6 +12,7 @@
 #include <vector>
 #include <queue>
 #include <math.h>
+#include <time.h>
 
 using namespace std;
 
@@ -140,6 +141,7 @@ public:
     void le_entrada();
     void exibe();
     void exibe_sem_cor();
+    void reset();
     int DFS(int x, int y, Caminho& c, float passo, char ordem);
     void BFS(int x, int y, Caminho& c);
     void Best_first_search(int x, int y, Caminho& c);
@@ -216,6 +218,18 @@ void Labirinto::exibe_sem_cor() {
                 cout << this->m[i][j];
         }    
         cout << endl;
+    }
+}
+/* Metodo que limpa o labirinto, removendo caracteres que nao representam
+    paredes, inicio e fim.
+*/
+void Labirinto::reset() {
+    for (int i = 0; i < this->lin; i++) {
+        for (int j = 0; j < this->col; j++) {
+            if (this->m[i][j] != '-' and this->m[i][j] != '#' and this->m[i][j] != '$') {
+                this->m[i][j] = '*';
+            }
+        }    
     }
 }
 
@@ -689,25 +703,68 @@ int main(int argc, char const **argv) {
     cout << endl << "-------------------------------------------------------------------------";
     cout << endl << endl;
 
+    clock_t comeco, fim;
+    double delta;
     Caminho c;
 
-    // lab.DFS(lab.xi, lab.yi, c, 0, 'a'-1);
-    // cout << "teminou dfs" << endl;
-    
-    // lab.BFS(lab.xi, lab.yi, c);
-    // cout << "teminou bfs" << endl;
-    
-    lab.Best_first_search(lab.xi, lab.yi, c);
-    cout << "terminou best first" << endl;
-
-    // lab.a_estrela(lab.xi, lab.yi, c);
-    // cout << "terminou A*" << endl;
-
+    // DFS
+    comeco = clock();
+    lab.DFS(lab.xi, lab.yi, c, 0, 'a'-1);
+    fim = clock();
+    delta = ((double) (fim - comeco)) / CLOCKS_PER_SEC;
+    cout << "teminou dfs, tempo de execucao: " << delta << " s" << endl;
     cout << "Caminho final:" << endl << endl;
     c.exibe();
     cout << endl << "-------------------------------------------------------------------------";
     cout << endl << endl << endl;
+    cout << "Labirinto apos execucao:" << endl << endl;
+    lab.exibe();
+    cout << endl << "-------------------------------------------------------------------------";
+    cout << endl << endl;
+    lab.reset();
 
+    // BFS
+    comeco = clock();
+    lab.BFS(lab.xi, lab.yi, c);
+    fim = clock();
+    delta = ((double) (fim - comeco)) / CLOCKS_PER_SEC;
+    cout << "teminou bfs, tempo de execucao: " << delta << " s" << endl;
+    cout << "Caminho final:" << endl << endl;
+    c.exibe();
+    cout << endl << "-------------------------------------------------------------------------";
+    cout << endl << endl << endl;
+    cout << "Labirinto apos execucao:" << endl << endl;
+    lab.exibe();
+    cout << endl << "-------------------------------------------------------------------------";
+    cout << endl << endl;
+    lab.reset();
+
+    // Best first
+    comeco = clock();
+    lab.Best_first_search(lab.xi, lab.yi, c);
+    fim = clock();
+    delta = ((double) (fim - comeco)) / CLOCKS_PER_SEC;
+    cout << "terminou best first, tempo de execucao: " << delta << " s" << endl;
+    cout << "Caminho final:" << endl << endl;
+    c.exibe();
+    cout << endl << "-------------------------------------------------------------------------";
+    cout << endl << endl << endl;
+    cout << "Labirinto apos execucao:" << endl << endl;
+    lab.exibe();
+    cout << endl << "-------------------------------------------------------------------------";
+    cout << endl << endl;
+    lab.reset();
+
+    // A*
+    comeco = clock();
+    lab.a_estrela(lab.xi, lab.yi, c);
+    fim = clock();
+    delta = ((double) (fim - comeco)) / CLOCKS_PER_SEC;
+    cout << "terminou A*, tempo de execucao: " << delta << " s" << endl;
+    cout << "Caminho final:" << endl << endl;
+    c.exibe();
+    cout << endl << "-------------------------------------------------------------------------";
+    cout << endl << endl << endl;
     cout << "Labirinto apos execucao:" << endl << endl;
     lab.exibe();
     cout << endl << "-------------------------------------------------------------------------";
