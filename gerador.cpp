@@ -13,6 +13,13 @@ using namespace std;
 int main(int argc, char const *argv[]) {
     srand(time(NULL));
 
+    if (argc < 2) {
+        cout << "Modo de uso:" << endl;
+        cout << "./gerador [M]" << endl;
+        cout << "M = 1 => paredes nas linhas" << endl << "M = 2 => paredes nas colunas" << endl;
+        exit(0);
+    }
+
     int rows, cols;
     int xi, yi, xf, yf;
     int i, j;
@@ -35,27 +42,37 @@ int main(int argc, char const *argv[]) {
     }
 
 
-    int index;
-    for (i = 1; i < rows; i += 2) {
-        index = rand() % cols;
+    int door;
+    // Paredes nas linhas
+    if (atoi(argv[1]) == 1) {
+        for (i = 1; i < rows; i += 2) {
+            door = rand() % cols;
+            for (j = 0; j < cols; j++) {
+                if (j != door) {
+                    lab[i][j] = '-';
+                }
+            }
+        }
+
+        yi = rand() % cols;
+        yf = rand() % cols;
+
+        lab[0][yi] = '#';
+        lab[rows-1][yf] = '$';
+    }
+
+    // Paredes nas colunas
+    else if (atoi(argv[1]) == 2) {
         for (j = 0; j < cols; j++) {
-            if (j != index) {
-                lab[i][j] = '-';
+            door = rand() % rows;
+            for (i = 0; i < rows; i++) {
+                if (i != door)
+                    lab[i][j] = '-';
             }
         }
     }
 
-    xi = rand() % rows;
-    yi = rand() % cols;
-    xf = rand() % rows;
-    yf = rand() % cols;
-
-    // cout << xi << " " << yi << endl;
-    // cout << xf << " " << yf << endl;
-
-    lab[xi][yi] = '#';
-    lab[xf][yf] = '$';
-
+    // Imprime o labirinto
     for (i = 0; i < rows; i++) {
         for (j = 0; j < cols; j++) {
             cout << lab[i][j];
@@ -63,10 +80,10 @@ int main(int argc, char const *argv[]) {
         cout << endl;
     }
 
+    // Libera memoria
     for (i = 0; i < rows; i++) {
         delete lab[i];
     }
     delete lab;
-
     return 0;
 }

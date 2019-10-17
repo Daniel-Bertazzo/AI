@@ -7,6 +7,7 @@
         Miguel de Mattos Gardini     - 10295728
 */
 
+#include <stdio.h>
 #include <iostream>
 #include <vector>
 #include <queue>
@@ -138,7 +139,7 @@ public:
 
     void le_entrada();
     void exibe();
-    int DFS(int x, int y, Caminho& c, float passo, int ordem);
+    int DFS(int x, int y, Caminho& c, float passo, char ordem);
     void BFS(int x, int y, Caminho& c);
     void Best_first_search(int x, int y, Caminho& c);
     void a_estrela(int x, int y, Caminho& c);
@@ -199,6 +200,8 @@ void Labirinto::exibe() {
                 cout << "\033[1;33mO\033[0m";
             else if (this->m[i][j] == '+')
                 cout << "\033[21;33m+\033[0m";
+            else if (this->m[i][j] >= 'a' and this->m[i][j] <= 'z')
+                printf("\033[1;33m%c\033[0m", this->m[i][j]);
             else
                 cout << this->m[i][j];
         }    
@@ -228,14 +231,14 @@ void Labirinto::exibe() {
 
     - caso nao tenha solucao, o caminho c retorna vazio.
 */
-int Labirinto::DFS(int x, int y, Caminho& c, float passo, int ordem) {
+int Labirinto::DFS(int x, int y, Caminho& c, float passo, char ordem) {
 
     if (ordem > 'z')
         ordem = 'a';
 
     // verifica se x ou y estao fora do labirinto ou sao paredes ou ja foram percorridos.
-    //if ((x < 0 or x >= this->lin) or (y < 0 or y >= this->col) or (this->m[x][y] == '-' or this->m[x][y] == 'O'))
-    if ((x < 0 or x >= this->lin) or (y < 0 or y >= this->col) or (this->m[x][y] != '*'))
+    // if ((x < 0 or x >= this->lin) or (y < 0 or y >= this->col) or (this->m[x][y] == '-' or this->m[x][y] == 'O'))
+    if ((x < 0 or x >= this->lin) or (y < 0 or y >= this->col) or (this->m[x][y] != '*' and this->m[x][y] != '$' and this->m[x][y] != '#'))
         return 0;
 
     // coloca (x,y) no caminho
@@ -392,9 +395,11 @@ void Labirinto::BFS(int x, int y, Caminho& c) {
     
     // marca caminho percorrido no labiritno.
     this->m[this->xi][this->yi] = '#';
+    char ordem = 'a';
     for(int i = 1; i < c.tamanho -1; i++) {
         vert = c.c[i];
-        this->m[vert.x][vert.y] = 'O';
+        this->m[vert.x][vert.y] = ordem;
+        (ordem == 'z') ? ordem = 'a' : ordem++;
     }
 }
 
@@ -514,9 +519,11 @@ void Labirinto::Best_first_search(int x, int y, Caminho& c) {
     
     // marca caminho percorrido no labiritno.
     this->m[this->xi][this->yi] = '#';
+    char ordem = 'a';
     for(int i = 1; i < c.tamanho -1; i++) {
         vert = c.c[i];
-        this->m[vert.x][vert.y] = 'O';
+        this->m[vert.x][vert.y] = ordem;
+        (ordem == 'z') ? ordem = 'a' : ordem++;
     }
 }
 
@@ -652,9 +659,11 @@ void Labirinto::a_estrela(int x, int y, Caminho& c) {
     
     // marca caminho percorrido no labiritno.
     this->m[this->xi][this->yi] = '#';
+    char ordem = 'a';
     for(int i = 1; i < c.tamanho -1; i++) {
         vert = c.c[i];
-        this->m[vert.x][vert.y] = 'O';
+        this->m[vert.x][vert.y] = ordem;
+        (ordem == 'z') ? ordem = 'a' : ordem++;
     }
 }
 
@@ -672,17 +681,17 @@ int main(int argc, char const **argv) {
 
     Caminho c;
 
-    // lab.DFS(lab.xi, lab.yi, c, 0, 'a');
+    // lab.DFS(lab.xi, lab.yi, c, 0, 'a'-1);
     // cout << "teminou dfs" << endl;
     
     // lab.BFS(lab.xi, lab.yi, c);
     // cout << "teminou bfs" << endl;
     
-    // lab.Best_first_search(lab.xi, lab.yi, c);
-    // cout << "terminou best first" << endl;
+    lab.Best_first_search(lab.xi, lab.yi, c);
+    cout << "terminou best first" << endl;
 
-    lab.a_estrela(lab.xi, lab.yi, c);
-    cout << "terminou A*" << endl;
+    // lab.a_estrela(lab.xi, lab.yi, c);
+    // cout << "terminou A*" << endl;
 
     cout << "Caminho final:" << endl << endl;
     c.exibe();
