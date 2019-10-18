@@ -7,6 +7,7 @@
 #include <stdlib.h>
 #include <time.h>
 #include <iostream>
+#include <stdio.h>
 
 using namespace std;
 
@@ -14,9 +15,10 @@ int main(int argc, char const *argv[]) {
     srand(time(NULL));
 
     if (argc < 2) {
-        cout << "Modo de uso:" << endl;
-        cout << "./gerador [M]" << endl;
-        cout << "M = 1 => paredes nas linhas" << endl << "M = 2 => paredes nas colunas" << endl;
+        cout << "Modo de uso:" << endl << "./gerador [M]" << endl;
+        cout << "M = 1 => paredes nas linhas" << endl;
+        cout << "M = 2 => paredes nas colunas" << endl;
+        cout << "M = 3 => labirinto vazio, pontos de origem e destino opostos" << endl;
         exit(0);
     }
 
@@ -25,26 +27,21 @@ int main(int argc, char const *argv[]) {
     int i, j;
     char **lab;
 
-    rows = (rand() % 50) + 5;
-    cols = (rand() % 50) + 5;
-
-    cout << rows << " " << cols << endl;
-
-    lab = new char*[rows];
-    for (i = 0; i < rows; i++) {
-        lab[i] = new char[cols];
-    }
-
-    for (i = 0; i < rows; i++) {
-        for (j = 0; j < cols; j++) {
-            lab[i][j] = '*';
-        }
-    }
-
-
     int door;
     // Paredes nas linhas
     if (atoi(argv[1]) == 1) {
+        rows = (rand() % 50) + 15;
+        cols = (rand() % 50) + 15;
+        cout << rows << " " << cols << endl;
+
+        lab = new char*[rows];
+        for (i = 0; i < rows; i++) {
+            lab[i] = new char[cols];
+            for (j = 0; j < cols; j++) {
+                lab[i][j] = '*';
+            }
+        }
+
         for (i = 1; i < rows; i += 2) {
             door = rand() % cols;
             for (j = 0; j < cols; j++) {
@@ -53,7 +50,6 @@ int main(int argc, char const *argv[]) {
                 }
             }
         }
-
         yi = rand() % cols;
         yf = rand() % cols;
 
@@ -63,6 +59,18 @@ int main(int argc, char const *argv[]) {
 
     // Paredes nas colunas
     else if (atoi(argv[1]) == 2) {
+        rows = (rand() % 50) + 15;
+        cols = (rand() % 50) + 15;
+        cout << rows << " " << cols << endl;
+
+        lab = new char*[rows];
+        for (i = 0; i < rows; i++) {
+            lab[i] = new char[cols];
+            for (j = 0; j < cols; j++) {
+                lab[i][j] = '*';
+            }
+        }
+
         for (j = 0; j < cols; j++) {
             door = rand() % rows;
             for (i = 0; i < rows; i++) {
@@ -70,7 +78,91 @@ int main(int argc, char const *argv[]) {
                     lab[i][j] = '-';
             }
         }
+        yi = rand() % cols;
+        yf = rand() % cols;
+
+        lab[0][yi] = '#';
+        lab[rows-1][yf] = '$';
     }
+
+    // Labirinto vazio
+    else if (atoi(argv[1]) == 3) {
+        cin >> rows >> cols;
+
+        lab = new char*[rows];
+        for (i = 0; i < rows; i++) {
+            lab[i] = new char[cols];
+            for (j = 0; j < cols; j++) {
+                lab[i][j] = '*';
+            }
+        }
+        lab[0][0] = '#';
+        lab[rows-1][cols-1] = '$';
+    }
+
+    // Labirinto aleatorio
+    else if (atoi(argv[1]) == 4) {
+        // rows = (rand() % 50) + 15;
+        // cols = (rand() % 50) + 15;
+        // Limite da DFS recursiva
+        // rows = 20;
+        // cols = 21;
+        rows = 2500;
+        cols = 200;
+        cout << rows << " " << cols << endl;
+
+        lab = new char*[rows];
+        for (i = 0; i < rows; i++) {
+            lab[i] = new char[cols];
+            for (j = 0; j < cols; j++) {
+                lab[i][j] = '*';
+            }
+        }
+
+        int path, threshold = 60;
+
+        for (i = 0; i < rows; i++) {
+            for (j = 0; j < cols; j++) {
+                path = rand() % 100;
+                if (path >= threshold) {
+                    lab[i][j] = '-';
+                } else {
+                    lab[i][j] = '*';
+                }
+            }
+        }
+
+        yi = rand() % cols;
+        yf = rand() % cols;
+        // xi = rand() % (rows/2);
+        // xf = rand() % (rows/2) + (rows/2);
+
+        lab[0][yi] = '#';
+        lab[rows-1][yf] = '$';
+        // lab[xi][0] = '#';
+        // lab[xf][cols-1] = '$';
+
+    }
+
+    // for (i = 0; i < rows; i++) {
+    //     for (j = 0; j < cols; j++) {
+    //         if (lab[i][j] == '-')
+    //             cout << "\033[1;41m-\033[0m";
+    //         else if (lab[i][j] == '#')
+    //             cout << "\033[1;46m#\033[0m";
+    //         else if (lab[i][j] == '$')
+    //             cout << "\033[1;42m$\033[0m";
+    //         else if (lab[i][j] == 'O')
+    //             cout << "\033[1;33mO\033[0m";
+    //         else if (lab[i][j] == '+')
+    //             cout << "\033[21;33m+\033[0m";
+    //         else if (lab[i][j] >= 'a' and lab[i][j] <= 'z')
+    //             printf("\033[1;33m%c\033[0m", lab[i][j]);
+    //         else
+    //             cout << lab[i][j];
+    //     }
+    //     cout << endl;
+    // }
 
     // Imprime o labirinto
     for (i = 0; i < rows; i++) {

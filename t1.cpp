@@ -1,6 +1,9 @@
 /* Trabalho 1 de Inteligencia Artificial, 2o semestre 2019
     Buscas em labirinto.
 
+    compilacao:
+    g++ t1.cpp -o t1
+
     Grupo:
         Alexandre Norcia Medeiros    - 10295583
         Daniel Penna Chaves Bertazzo - 10349561
@@ -11,6 +14,7 @@
 #include <iostream>
 #include <vector>
 #include <queue>
+#include <stack>
 #include <math.h>
 #include <time.h>
 
@@ -71,6 +75,7 @@ public:
     void pop_back();
     Vertice back() const;
     void calcula_h(int x, int y);
+    void calcula_h2(int x, int y);
 
     // sobrecarga de operadores
     bool operator< (const Caminho& c2) const;
@@ -113,6 +118,11 @@ Vertice Caminho::back() const{
 void Caminho::calcula_h(int x, int y) {
     Vertice aux = this->back();
     this->h = sqrt((aux.x - x)*(aux.x - x) + (aux.y - y)*(aux.y - y));
+}
+
+void Caminho::calcula_h2(int x, int y) {
+    Vertice aux = this->back();
+    this->h = (aux.x - x)*(aux.x - x) + (aux.y - y)*(aux.y - y);
 }
 
  /* Sobrecarga da comparacao '<'
@@ -231,6 +241,9 @@ void Labirinto::reset() {
             }
         }    
     }
+
+    this->m[this->xi][this->yi] = '#';
+    this->m[this->xf][this->yf] = '$';
 }
 
 /* Busca em Profundidade recursiva.
@@ -578,7 +591,8 @@ void Labirinto::a_estrela(int x, int y, Caminho& c) {
     priority_queue<Caminho, vector<Caminho>, decltype(f_comparacao)> q(f_comparacao);
 
     aux_c.push_back(Vertice(x,y));
-    aux_c.calcula_h(this->xf, this->yf);
+    // aux_c.calcula_h(this->xf, this->yf);
+    aux_c.calcula_h2(this->xf, this->yf);
     q.push(aux_c); // adiciona vertice inicial na fila
     this->m[x][y] = '+'; // marca como visitado
     this->m[this->xf][this->yf] = '*'; // marca objetivo com nao visitado.
@@ -602,7 +616,8 @@ void Labirinto::a_estrela(int x, int y, Caminho& c) {
         if(vert.x-1 >= 0 and vert.y+1 < this->col and this->m[vert.x-1][vert.y+1] == '*' ) {
             aux_c.push_back(Vertice(vert.x-1, vert.y+1));
             aux_c.peso += RAIZ_2;
-            aux_c.calcula_h(this->xf, this->yf);
+            // aux_c.calcula_h(this->xf, this->yf);
+            aux_c.calcula_h2(this->xf, this->yf);
             q.push(aux_c); // cria uma copia de aux em q
             aux_c.pop_back();
             aux_c.peso -= RAIZ_2;
@@ -612,7 +627,8 @@ void Labirinto::a_estrela(int x, int y, Caminho& c) {
         if(vert.x+1 < this->lin and vert.y+1 < this->col and this->m[vert.x+1][vert.y+1] == '*' ) {
             aux_c.push_back(Vertice(vert.x+1, vert.y+1));
             aux_c.peso += RAIZ_2;
-            aux_c.calcula_h(this->xf, this->yf);
+            // aux_c.calcula_h(this->xf, this->yf);
+            aux_c.calcula_h2(this->xf, this->yf);
             q.push(aux_c); // cria uma copia de aux em q
             aux_c.pop_back();
             aux_c.peso -= RAIZ_2;
@@ -622,7 +638,8 @@ void Labirinto::a_estrela(int x, int y, Caminho& c) {
         if(vert.x+1 < this->lin and vert.y-1 >= 0 and this->m[vert.x+1][vert.y-1] == '*' ) {
             aux_c.push_back(Vertice(vert.x+1, vert.y-1));
             aux_c.peso += RAIZ_2;
-            aux_c.calcula_h(this->xf, this->yf);
+            // aux_c.calcula_h(this->xf, this->yf);
+            aux_c.calcula_h2(this->xf, this->yf);
             q.push(aux_c); // cria uma copia de aux em q
             aux_c.pop_back();
             aux_c.peso -= RAIZ_2;
@@ -632,7 +649,8 @@ void Labirinto::a_estrela(int x, int y, Caminho& c) {
         if(vert.x-1 >= 0 and vert.y-1 >= 0 and this->m[vert.x-1][vert.y-1] == '*' ) {
             aux_c.push_back(Vertice(vert.x-1, vert.y-1));
             aux_c.peso += RAIZ_2;
-            aux_c.calcula_h(this->xf, this->yf);
+            // aux_c.calcula_h(this->xf, this->yf);
+            aux_c.calcula_h2(this->xf, this->yf);
             q.push(aux_c); // cria uma copia de aux em q
             aux_c.pop_back();
             aux_c.peso -= RAIZ_2;
@@ -643,7 +661,8 @@ void Labirinto::a_estrela(int x, int y, Caminho& c) {
         if(vert.x-1 >= 0 and this->m[vert.x-1][vert.y] == '*' ) {
             aux_c.push_back(Vertice(vert.x-1, vert.y));
             aux_c.peso += 1.0;
-            aux_c.calcula_h(this->xf, this->yf);
+            // aux_c.calcula_h(this->xf, this->yf);
+            aux_c.calcula_h2(this->xf, this->yf);
             q.push(aux_c); // cria uma copia de aux em q
             aux_c.peso -= 1.0;
             aux_c.pop_back();
@@ -653,7 +672,8 @@ void Labirinto::a_estrela(int x, int y, Caminho& c) {
         if(vert.y+1 < this->col and this->m[vert.x][vert.y+1] == '*' ) {
             aux_c.push_back(Vertice(vert.x, vert.y+1));
             aux_c.peso += 1.0;
-            aux_c.calcula_h(this->xf, this->yf);
+            // aux_c.calcula_h(this->xf, this->yf);
+            aux_c.calcula_h2(this->xf, this->yf);
             q.push(aux_c); // cria uma copia de aux em q
             aux_c.pop_back();
             aux_c.peso -= 1.0;
@@ -663,7 +683,8 @@ void Labirinto::a_estrela(int x, int y, Caminho& c) {
         if(vert.x+1 < this->lin and this->m[vert.x+1][vert.y] == '*' ) {
             aux_c.push_back(Vertice(vert.x+1, vert.y));
             aux_c.peso += 1.0;
-            aux_c.calcula_h(this->xf, this->yf);
+            // aux_c.calcula_h(this->xf, this->yf);
+            aux_c.calcula_h2(this->xf, this->yf);
             q.push(aux_c); // cria uma copia de aux em q
             aux_c.pop_back();
             aux_c.peso -= 1.0;
@@ -673,7 +694,8 @@ void Labirinto::a_estrela(int x, int y, Caminho& c) {
         if(vert.y-1 >= 0 and this->m[vert.x][vert.y-1] == '*' ) {
             aux_c.push_back(Vertice(vert.x, vert.y-1));
             aux_c.peso += 1.0;
-            aux_c.calcula_h(this->xf, this->yf);
+            // aux_c.calcula_h(this->xf, this->yf);
+            aux_c.calcula_h2(this->xf, this->yf);
             q.push(aux_c); // cria uma copia de aux em q
             aux_c.pop_back();
             aux_c.peso -= 1.0;
@@ -708,20 +730,20 @@ int main(int argc, char const **argv) {
     Caminho c;
 
     // DFS
-    comeco = clock();
-    lab.DFS(lab.xi, lab.yi, c, 0, 'a'-1);
-    fim = clock();
-    delta = ((double) (fim - comeco)) / CLOCKS_PER_SEC;
-    cout << "teminou dfs, tempo de execucao: " << delta << " s" << endl;
-    cout << "Caminho final:" << endl << endl;
-    c.exibe();
-    cout << endl << "-------------------------------------------------------------------------";
-    cout << endl << endl << endl;
-    cout << "Labirinto apos execucao:" << endl << endl;
-    lab.exibe();
-    cout << endl << "-------------------------------------------------------------------------";
-    cout << endl << endl;
-    lab.reset();
+    // comeco = clock();
+    // lab.DFS(lab.xi, lab.yi, c, 0, 'a'-1);
+    // fim = clock();
+    // delta = ((double) (fim - comeco)) / CLOCKS_PER_SEC;
+    // cout << "teminou dfs, tempo de execucao: " << delta << " s" << endl;
+    // cout << "Caminho final:" << endl << endl;
+    // c.exibe();
+    // cout << endl << "-------------------------------------------------------------------------";
+    // cout << endl << endl << endl;
+    // cout << "Labirinto apos execucao:" << endl << endl;
+    // lab.exibe();
+    // cout << endl << "-------------------------------------------------------------------------";
+    // cout << endl << endl;
+    // lab.reset();
 
     // BFS
     comeco = clock();
