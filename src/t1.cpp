@@ -2,7 +2,7 @@
     Buscas em labirinto.
 
     compilacao:
-    g++ t1.cpp -o t1
+    g++ t1.cpp -o t1 -std=c++11
 
     Grupo:
         Alexandre Norcia Medeiros    - 10295583
@@ -740,15 +740,16 @@ int main(int argc, char const **argv) {
     
     Labirinto lab;
     lab.le_entrada();
-    cout << "Labirinto a ser explorado:" << endl << endl;
-    lab.exibe();
-    cout << endl << "-------------------------------------------------------------------------";
-    cout << endl << endl;
+    // cout << "Labirinto a ser explorado:" << endl << endl;
+    // lab.exibe();
+    // cout << endl << "-------------------------------------------------------------------------";
+    // cout << endl << endl;
 
     clock_t comeco, fim;
     double delta;
     Caminho c;
 
+    /* Impressao mostrando o labirinto */
     // // DFS
     // comeco = clock();
     // lab.DFS(lab.xi, lab.yi, c, 0, 'a'-1);
@@ -765,93 +766,6 @@ int main(int argc, char const **argv) {
     // cout << endl << endl;
     // lab.reset();
 
-    // BFS
-    comeco = clock();
-    lab.BFS(lab.xi, lab.yi, c);
-    fim = clock();
-    delta = ((double) (fim - comeco)) / CLOCKS_PER_SEC;
-    cout << "teminou bfs, tempo de execucao: " << delta << " s" << endl;
-    cout << "caminho tamanho: " << c.tamanho << ", peso: " << c.peso << endl;
-    cout << "Caminho final:" << endl << endl;
-    c.exibe();
-    cout << endl << "-------------------------------------------------------------------------";
-    cout << endl << endl << endl;
-    cout << "Labirinto apos execucao:" << endl << endl;
-    lab.exibe();
-    cout << endl << "-------------------------------------------------------------------------";
-    cout << endl << endl;
-    lab.reset();
-
-    // Best first
-    comeco = clock();
-    lab.Best_first_search(lab.xi, lab.yi, c);
-    fim = clock();
-    delta = ((double) (fim - comeco)) / CLOCKS_PER_SEC;
-    cout << "terminou best first, tempo de execucao: " << delta << " s" << endl;
-    cout << "caminho tamanho: " << c.tamanho << ", peso: " << c.peso << endl;
-    cout << "Caminho final:" << endl << endl;
-    c.exibe();
-    cout << endl << "-------------------------------------------------------------------------";
-    cout << endl << endl << endl;
-    cout << "Labirinto apos execucao:" << endl << endl;
-    lab.exibe();
-    cout << endl << "-------------------------------------------------------------------------";
-    cout << endl << endl;
-    lab.reset();
-    
-    // A* h1
-    comeco = clock();
-    lab.a_estrela(lab.xi, lab.yi, c, 1);
-    fim = clock();
-    delta = ((double) (fim - comeco)) / CLOCKS_PER_SEC;
-    cout << "terminou A* - h1 (distancia euclidiana), tempo de execucao: " << delta << " s" << endl;
-    cout << "caminho tamanho: " << c.tamanho << ", peso: " << c.peso << endl;
-    cout << "Caminho final:" << endl << endl;
-    c.exibe();
-    cout << endl << "-------------------------------------------------------------------------";
-    cout << endl << endl << endl;
-    cout << "Labirinto apos execucao:" << endl << endl;
-    lab.exibe();
-    cout << endl << "-------------------------------------------------------------------------";
-    cout << endl << endl;
-    lab.reset();
-    
-    // A* h2
-    comeco = clock();
-    lab.a_estrela(lab.xi, lab.yi, c, 2);
-    fim = clock();
-    delta = ((double) (fim - comeco)) / CLOCKS_PER_SEC;
-    cout << "terminou A* - h2 (distancia euclidiana ao quadrado), tempo de execucao: " << delta << " s" << endl;
-    cout << "caminho tamanho: " << c.tamanho << ", peso: " << c.peso << endl;
-    cout << "Caminho final:" << endl << endl;
-    c.exibe();
-    cout << endl << "-------------------------------------------------------------------------";
-    cout << endl << endl << endl;
-    cout << "Labirinto apos execucao:" << endl << endl;
-    lab.exibe();
-    cout << endl << "-------------------------------------------------------------------------";
-    cout << endl << endl;
-    lab.reset();
-
-    // A* h3
-    comeco = clock();
-    lab.a_estrela(lab.xi, lab.yi, c, 3);
-    fim = clock();
-    delta = ((double) (fim - comeco)) / CLOCKS_PER_SEC;
-    cout << "terminou A* - h3 (distancia manhattan), tempo de execucao: " << delta << " s" << endl;
-    cout << "caminho tamanho: " << c.tamanho << ", peso: " << c.peso << endl;
-    cout << "Caminho final:" << endl << endl;
-    c.exibe();
-    cout << endl << "-------------------------------------------------------------------------";
-    cout << endl << endl << endl;
-    cout << "Labirinto apos execucao:" << endl << endl;
-    lab.exibe();
-    cout << endl << "-------------------------------------------------------------------------";
-    cout << endl << endl;
-    lab.reset();
-
-    
-    // execucao sem imprimir o labirinto
     // // BFS
     // comeco = clock();
     // lab.BFS(lab.xi, lab.yi, c);
@@ -859,6 +773,14 @@ int main(int argc, char const **argv) {
     // delta = ((double) (fim - comeco)) / CLOCKS_PER_SEC;
     // cout << "teminou bfs, tempo de execucao: " << delta << " s" << endl;
     // cout << "caminho tamanho: " << c.tamanho << ", peso: " << c.peso << endl;
+    // cout << "Caminho final:" << endl << endl;
+    // c.exibe();
+    // cout << endl << "-------------------------------------------------------------------------";
+    // cout << endl << endl << endl;
+    // cout << "Labirinto apos execucao:" << endl << endl;
+    // lab.exibe();
+    // cout << endl << "-------------------------------------------------------------------------";
+    // cout << endl << endl;
     // lab.reset();
 
     // // Best first
@@ -868,6 +790,14 @@ int main(int argc, char const **argv) {
     // delta = ((double) (fim - comeco)) / CLOCKS_PER_SEC;
     // cout << "terminou best first, tempo de execucao: " << delta << " s" << endl;
     // cout << "caminho tamanho: " << c.tamanho << ", peso: " << c.peso << endl;
+    // cout << "Caminho final:" << endl << endl;
+    // c.exibe();
+    // cout << endl << "-------------------------------------------------------------------------";
+    // cout << endl << endl << endl;
+    // cout << "Labirinto apos execucao:" << endl << endl;
+    // lab.exibe();
+    // cout << endl << "-------------------------------------------------------------------------";
+    // cout << endl << endl;
     // lab.reset();
     
     // // A* h1
@@ -877,6 +807,14 @@ int main(int argc, char const **argv) {
     // delta = ((double) (fim - comeco)) / CLOCKS_PER_SEC;
     // cout << "terminou A* - h1 (distancia euclidiana), tempo de execucao: " << delta << " s" << endl;
     // cout << "caminho tamanho: " << c.tamanho << ", peso: " << c.peso << endl;
+    // cout << "Caminho final:" << endl << endl;
+    // c.exibe();
+    // cout << endl << "-------------------------------------------------------------------------";
+    // cout << endl << endl << endl;
+    // cout << "Labirinto apos execucao:" << endl << endl;
+    // lab.exibe();
+    // cout << endl << "-------------------------------------------------------------------------";
+    // cout << endl << endl;
     // lab.reset();
     
     // // A* h2
@@ -886,6 +824,14 @@ int main(int argc, char const **argv) {
     // delta = ((double) (fim - comeco)) / CLOCKS_PER_SEC;
     // cout << "terminou A* - h2 (distancia euclidiana ao quadrado), tempo de execucao: " << delta << " s" << endl;
     // cout << "caminho tamanho: " << c.tamanho << ", peso: " << c.peso << endl;
+    // cout << "Caminho final:" << endl << endl;
+    // c.exibe();
+    // cout << endl << "-------------------------------------------------------------------------";
+    // cout << endl << endl << endl;
+    // cout << "Labirinto apos execucao:" << endl << endl;
+    // lab.exibe();
+    // cout << endl << "-------------------------------------------------------------------------";
+    // cout << endl << endl;
     // lab.reset();
 
     // // A* h3
@@ -895,7 +841,62 @@ int main(int argc, char const **argv) {
     // delta = ((double) (fim - comeco)) / CLOCKS_PER_SEC;
     // cout << "terminou A* - h3 (distancia manhattan), tempo de execucao: " << delta << " s" << endl;
     // cout << "caminho tamanho: " << c.tamanho << ", peso: " << c.peso << endl;
+    // cout << "Caminho final:" << endl << endl;
+    // c.exibe();
+    // cout << endl << "-------------------------------------------------------------------------";
+    // cout << endl << endl << endl;
+    // cout << "Labirinto apos execucao:" << endl << endl;
+    // lab.exibe();
+    // cout << endl << "-------------------------------------------------------------------------";
+    // cout << endl << endl;
     // lab.reset();
+
+    
+    /* execucao sem imprimir o labirinto */
+    // BFS
+    comeco = clock();
+    lab.BFS(lab.xi, lab.yi, c);
+    fim = clock();
+    delta = ((double) (fim - comeco)) / CLOCKS_PER_SEC;
+    cout << "teminou bfs, tempo de execucao: " << delta << " s" << endl;
+    cout << "caminho tamanho: " << c.tamanho << ", peso: " << c.peso << endl;
+    lab.reset();
+
+    // Best first
+    comeco = clock();
+    lab.Best_first_search(lab.xi, lab.yi, c);
+    fim = clock();
+    delta = ((double) (fim - comeco)) / CLOCKS_PER_SEC;
+    cout << "terminou best first, tempo de execucao: " << delta << " s" << endl;
+    cout << "caminho tamanho: " << c.tamanho << ", peso: " << c.peso << endl;
+    lab.reset();
+    
+    // A* h1
+    comeco = clock();
+    lab.a_estrela(lab.xi, lab.yi, c, 1);
+    fim = clock();
+    delta = ((double) (fim - comeco)) / CLOCKS_PER_SEC;
+    cout << "terminou A* - h1 (distancia euclidiana), tempo de execucao: " << delta << " s" << endl;
+    cout << "caminho tamanho: " << c.tamanho << ", peso: " << c.peso << endl;
+    lab.reset();
+    
+    // A* h2
+    comeco = clock();
+    lab.a_estrela(lab.xi, lab.yi, c, 2);
+    fim = clock();
+    delta = ((double) (fim - comeco)) / CLOCKS_PER_SEC;
+    cout << "terminou A* - h2 (distancia euclidiana ao quadrado), tempo de execucao: " << delta << " s" << endl;
+    cout << "caminho tamanho: " << c.tamanho << ", peso: " << c.peso << endl;
+    lab.reset();
+
+    // A* h3
+    comeco = clock();
+    lab.a_estrela(lab.xi, lab.yi, c, 3);
+    fim = clock();
+    delta = ((double) (fim - comeco)) / CLOCKS_PER_SEC;
+    cout << "terminou A* - h3 (distancia manhattan), tempo de execucao: " << delta << " s" << endl;
+    cout << "caminho tamanho: " << c.tamanho << ", peso: " << c.peso << endl;
+    lab.reset();
 
     return 0;
 }

@@ -2,6 +2,9 @@
     Estrutura do arquivo a ser gerado:
     [linhas] [colunas]
     [matriz]
+
+    compilacao:
+    g++ gerador.cpp -o gerador
 */
 
 #include <stdlib.h>
@@ -15,11 +18,13 @@ int main(int argc, char const *argv[]) {
     srand(time(NULL));
 
     if (argc < 2) {
-        cout << "Modo de uso:" << endl << "./gerador [M]" << endl;
-        cout << "M = 1 => paredes nas linhas" << endl;
-        cout << "M = 2 => paredes nas colunas" << endl;
-        cout << "M = 3 => labirinto vazio, pontos de origem e destino opostos" << endl;
-        cout << "M = 4 => labirinto aleatorio" << endl;
+        cout << "Modo de uso:" << endl << "./gerador [Mode]" << endl;
+        cout << "Mode = 1 => paredes nas linhas" << endl;
+        cout << "Mode = 2 => paredes nas colunas" << endl;
+        cout << "Mode = 3 => labirinto vazio, pontos de origem e destino opostos" << endl;
+        cout << "Mode = 4 => labirinto aleatorio" << endl;
+        cout << "Colocar '> out.txt' ao chamar o programa, para colocar o labirinto gerado em um arquivo texto," << endl;
+        cout << "podendo ser usado como entrada das buscas posteriormente."
         exit(0);
     }
 
@@ -30,7 +35,17 @@ int main(int argc, char const *argv[]) {
 
     int door;
   
-    // Paredes nas linhas
+    /* ..:: Modo 1 (paredes nas linhas) ::.. */
+    // Gera labirintos do tipo:
+    //
+    //       * * # * * * * * * *
+    //       - - - - * - - - - -
+    //       * * * * * * * * * *
+    //       - * - - - - - - - -
+    //       * * * * * * * * * *
+    //       - - - - - - - - * -
+    //       * * * * * $ * * * *
+    //
     if (atoi(argv[1]) == 1) {
         rows = (rand() % 50) + 15;
         cols = (rand() % 50) + 15;
@@ -59,7 +74,17 @@ int main(int argc, char const *argv[]) {
         lab[rows-1][yf] = '$';
     }
 
-    // Paredes nas colunas
+    /* ..:: Modo 2 (paredes nas colunas) ::.. */
+    // Gera labirintos do tipo:
+    // 
+    //     * - * - * - * - * - *
+    //     * - * - * - * * * - *
+    //     * - * - * - * - * - $
+    //     * - * * * - * - * - *
+    //     # - * - * * * - * - *
+    //     * * * - * - * - * * *
+    //     * - * - * - * - * - *
+    // 
     else if (atoi(argv[1]) == 2) {
         rows = (rand() % 50) + 15;
         cols = (rand() % 50) + 15;
@@ -87,7 +112,17 @@ int main(int argc, char const *argv[]) {
         lab[rows-1][yf] = '$';
     }
 
-    // Labirinto vazio
+    /* ..:: Modo 3 (labirinto vazio) ::.. */
+    // Gera labirintos do tipo:
+    // 
+    //     # * * * * * * * * *
+    //     * * * * * * * * * *
+    //     * * * * * * * * * *
+    //     * * * * * * * * * *
+    //     * * * * * * * * * *
+    //     * * * * * * * * * *
+    //     * * * * * * * * * $
+    //
     else if (atoi(argv[1]) == 3) {
         cin >> rows >> cols;
 
@@ -102,19 +137,29 @@ int main(int argc, char const *argv[]) {
         lab[rows-1][cols-1] = '$';
     }
 
-    // Labirinto aleatorio
+    /* ..:: Modo 4 (labirinto aleatorio) ::.. */
+    // Gera labirintos do tipo:
+    // 
+    //     * * * # * * * * * *
+    //     * * - - - - - - - *
+    //     - * - * * - * - * *
+    //     * * - * - * - * * *
+    //     - * - * * * - - - *
+    //     - * * * * * * * * *
+    //     - * * - * * * * * $
+    //
     else if (atoi(argv[1]) == 4) {
-        // Valores das linhas e colunas aleatorios
-        // rows = (rand() % 50) + 15;
-        // cols = (rand() % 50) + 15;
+        // Valores das linhas e colunas gereados aleatoriamente
+        rows = (rand() % 50) + 15;
+        cols = (rand() % 50) + 15;
 
-        // Limite da DFS recursiva
+        // Dimensoes limite da DFS recursiva
         // rows = 20;
         // cols = 21;
 
         // Valor maximo testado para as outras buscas (todas menos DFS)
-        rows = 1000;
-        cols = 1000;
+        // rows = 1000;
+        // cols = 1000;
         cout << rows << " " << cols << endl;
 
         lab = new char*[rows];
@@ -125,12 +170,14 @@ int main(int argc, char const *argv[]) {
             }
         }
 
-        int path, threshold = 60;
+        // Chance de ser caminho = threshold
+        // Chance de ser parede =  100 - threshold
+        int cell, threshold = 60;
 
         for (i = 0; i < rows; i++) {
             for (j = 0; j < cols; j++) {
-                path = rand() % 100;
-                if (path >= threshold) {
+                cell = rand() % 100;
+                if (cell >= threshold) {
                     lab[i][j] = '-';
                 } else {
                     lab[i][j] = '*';
@@ -138,13 +185,15 @@ int main(int argc, char const *argv[]) {
             }
         }
 
+        // Inicio na primeira linha, fim na ultima linha
         yi = rand() % cols;
         yf = rand() % cols;
-        // xi = rand() % (rows/2);
-        // xf = rand() % (rows/2) + (rows/2);
-
         lab[0][yi] = '#';
         lab[rows-1][yf] = '$';
+
+        // Inicio na primeira coluna, fim na ultima coluna
+        // xi = rand() % (rows/2);
+        // xf = rand() % (rows/2) + (rows/2);
         // lab[xi][0] = '#';
         // lab[xf][cols-1] = '$';
 
