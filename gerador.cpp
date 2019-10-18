@@ -19,6 +19,7 @@ int main(int argc, char const *argv[]) {
         cout << "M = 1 => paredes nas linhas" << endl;
         cout << "M = 2 => paredes nas colunas" << endl;
         cout << "M = 3 => labirinto vazio, pontos de origem e destino opostos" << endl;
+        cout << "M = 4 => labirinto aleatorio" << endl;
         exit(0);
     }
 
@@ -28,6 +29,7 @@ int main(int argc, char const *argv[]) {
     char **lab;
 
     int door;
+  
     // Paredes nas linhas
     if (atoi(argv[1]) == 1) {
         rows = (rand() % 50) + 15;
@@ -102,13 +104,17 @@ int main(int argc, char const *argv[]) {
 
     // Labirinto aleatorio
     else if (atoi(argv[1]) == 4) {
+        // Valores das linhas e colunas aleatorios
         // rows = (rand() % 50) + 15;
         // cols = (rand() % 50) + 15;
+
         // Limite da DFS recursiva
         // rows = 20;
         // cols = 21;
-        rows = 2500;
-        cols = 200;
+
+        // Valor maximo testado para as outras buscas (todas menos DFS)
+        rows = 1000;
+        cols = 1000;
         cout << rows << " " << cols << endl;
 
         lab = new char*[rows];
@@ -143,26 +149,6 @@ int main(int argc, char const *argv[]) {
         // lab[xf][cols-1] = '$';
 
     }
-
-    // for (i = 0; i < rows; i++) {
-    //     for (j = 0; j < cols; j++) {
-    //         if (lab[i][j] == '-')
-    //             cout << "\033[1;41m-\033[0m";
-    //         else if (lab[i][j] == '#')
-    //             cout << "\033[1;46m#\033[0m";
-    //         else if (lab[i][j] == '$')
-    //             cout << "\033[1;42m$\033[0m";
-    //         else if (lab[i][j] == 'O')
-    //             cout << "\033[1;33mO\033[0m";
-    //         else if (lab[i][j] == '+')
-    //             cout << "\033[21;33m+\033[0m";
-    //         else if (lab[i][j] >= 'a' and lab[i][j] <= 'z')
-    //             printf("\033[1;33m%c\033[0m", lab[i][j]);
-    //         else
-    //             cout << lab[i][j];
-    //     }
-    //     cout << endl;
-    // }
 
     // Imprime o labirinto
     for (i = 0; i < rows; i++) {
